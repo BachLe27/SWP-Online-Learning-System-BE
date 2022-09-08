@@ -29,4 +29,3 @@ class UserChangePassword(BaseModel):
 class User(UserUpdate, CommonAttrs):
     username: str
     role: str
-    active: bool
