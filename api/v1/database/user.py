@@ -5,8 +5,11 @@ from .base import Base, Crud
 
 class UserRole:
     ADMIN = "ADMIN"
-    TEACHER = "TEACHER"
-    STUDENT = "STUDENT"
+    EXPERT = "EXPERT"
+    MARKETER = "MARKETER"
+    SELLER = "SELLER"
+    USER = "USER"
+
 
 class UserCrud(Crud, Base):
     __tablename__ = "Users"
@@ -22,6 +25,11 @@ class UserCrud(Crud, Base):
     address = Column(Text, nullable=False)
     gender = Column(Boolean, nullable=False)
     role = Column(String, nullable=False)
+
+    @classmethod
+    async def create(cls, attrs: dict) -> str:
+        attrs["role"] = UserRole.USER
+        return await super().create(attrs)
 
     @classmethod
     async def find_by_username(cls, username: str):
