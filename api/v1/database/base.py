@@ -1,11 +1,12 @@
+import os
 from datetime import datetime
 from uuid import uuid4
 
 from databases import Database
-from sqlalchemy import create_engine, delete, insert, select, update
+from sqlalchemy import Column, DateTime, String, create_engine, delete, insert, select, update
 from sqlalchemy.ext.declarative import declarative_base
 
-DATABASE_URL = "sqlite:///./database.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///database.db")
 
 engine = create_engine(DATABASE_URL)
 
@@ -13,6 +14,10 @@ Base = declarative_base()
 
 class Crud:
     db = Database(DATABASE_URL)
+
+    id = Column(String, primary_key=True, index=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     @classmethod
     async def create(cls, attrs: dict) -> str:

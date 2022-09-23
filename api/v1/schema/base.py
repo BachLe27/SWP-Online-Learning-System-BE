@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class CommonAttrs(BaseModel):
+class CommonAttrs:
     id: str
     created_at: datetime
     updated_at: datetime

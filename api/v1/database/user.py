@@ -5,25 +5,23 @@ from .base import Base, Crud
 
 class UserRole:
     ADMIN = "ADMIN"
+    STAFF = "STAFF"
     EXPERT = "EXPERT"
-    MARKETER = "MARKETER"
-    SELLER = "SELLER"
     USER = "USER"
-
 
 class UserCrud(Crud, Base):
     __tablename__ = "Users"
 
-    id = Column(String, primary_key=True, index=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
-
     username = Column(String, nullable=False, unique=True, index=True)
+    email = Column(String, nullable=False, unique=True, index=True)
     password = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
-    email = Column(String, nullable=False, unique=True, index=True)
-    address = Column(Text, nullable=False)
     gender = Column(Boolean, nullable=False)
+    dob = Column(DateTime, nullable=False)
+    phone = Column(String, nullable=False)
+    address = Column(Text, nullable=False)
+    bio = Column(Text, nullable=False)
+    avatar = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
     @classmethod

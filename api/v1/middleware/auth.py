@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 
 from fastapi import Depends
@@ -10,7 +11,7 @@ from ..database.user import UserCrud
 from ..exception.http import CredentialException, ForbiddenException, NotFoundException
 from ..schema.user import User
 
-SECRET_KEY = "placeholder"
+SECRET_KEY = os.getenv("SECRET_KEY", "secret")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -55,6 +56,9 @@ def require_owner(crud: Crud):
             raise ForbiddenException()
         return obj
     return func
+
+def require_roles():
+    pass
 
 def require_owner_or_roles(crud: Crud, roles: tuple):
     async def func(obj = Depends(crud.find_by_id), user: User = Depends(get_current_user)):

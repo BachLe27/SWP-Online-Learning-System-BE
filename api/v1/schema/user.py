@@ -1,22 +1,41 @@
-from pydantic import BaseModel
+from .base import BaseModel, CommonAttrs, datetime
 
-from .base import CommonAttrs
 
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    email: str
+
+    full_name: str
+    gender: bool
+    dob: datetime
+    phone: str
+    address: str
+    bio: str
+    avatar: str
 
 class UserUpdate(BaseModel):
     full_name: str
-    email: str
-    address: str
     gender: bool
-
-class UserCreate(UserUpdate):
-    username: str
-    password: str
+    dob: datetime
+    phone: str
+    address: str
+    bio: str
+    avatar: str
 
 class UserChangePassword(BaseModel):
     old_password: str
     new_password: str
 
-class User(UserUpdate, CommonAttrs):
+class User(CommonAttrs, BaseModel):
     username: str
+    email: str
+
+    full_name: str
+    gender: bool
+    dob: datetime
+    phone: str
+    address: str
+    bio: str
+    avatar: str
     role: str
