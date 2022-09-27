@@ -1,21 +1,27 @@
-import os
 from datetime import datetime
+from os import getenv
 from uuid import uuid4
 
 from databases import Database
-from sqlalchemy import Column, DateTime, String, create_engine, delete, insert, select, update
+from sqlalchemy import Column, DateTime, String, delete, insert, select, update
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///database.db")
+DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:///database.db")
 
-engine = create_engine(DATABASE_URL)
+engine = create_async_engine(DATABASE_URL)
 
 Base = declarative_base()
+
+async def init_database():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    await Crud.db.connect()
 
 class Crud:
     db = Database(DATABASE_URL)
 
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, index=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
@@ -32,15 +38,15 @@ class Crud:
         return await cls.db.fetch_one(select(cls).where(cls.id == id))
 
     @classmethod
-    async def find_all_by_attr(cls, attr, value, limit: int = 10, offset: int = 0):
+    async def find_all_by_attr(cls, attr, value, limit, offset):
         return await cls.db.fetch_all(select(cls).limit(limit).offset(offset).where(attr == value))
 
     @classmethod
-    async def find_all_by_user_id(cls, id: str, limit: int = 10, offset: int = 0):
+    async def find_all_by_user_id(cls, id: str, limit, offset):
         return await cls.find_all_by_attr(cls.user_id, id, limit, offset)
 
     @classmethod
-    async def find_all(cls, limit: int = 10, offset: int = 0):
+    async def find_all(cls, limit, offset):
         return await cls.db.fetch_all(select(cls).limit(limit).offset(offset))
 
     @classmethod

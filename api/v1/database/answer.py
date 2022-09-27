@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Text, Boolean
+from sqlalchemy import Boolean, Column, ForeignKey, String, Text
 
 from .base import Base, Crud
 
@@ -8,4 +8,4 @@ class AnswerCrud(Crud, Base):
 
     content = Column(Text, nullable=False)
     is_correct = Column(Boolean, nullable=False)
-    question_id = Column(String, ForeignKey("Questions.id"), nullable=False)
+    question_id = Column(String(36), ForeignKey("Questions.id"), nullable=False)

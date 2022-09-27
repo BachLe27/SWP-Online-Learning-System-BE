@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, String, Text, select
+from sqlalchemy import Boolean, Column, Date, String, Text, select
 
 from .base import Base, Crud
 
@@ -8,25 +8,26 @@ class UserRole:
     STAFF = "STAFF"
     EXPERT = "EXPERT"
     USER = "USER"
+    ALL = [ADMIN, STAFF, EXPERT, USER]
 
 class UserCrud(Crud, Base):
     __tablename__ = "Users"
 
-    username = Column(String, nullable=False, unique=True, index=True)
-    email = Column(String, nullable=False, unique=True, index=True)
-    password = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
+    username = Column(String(256), nullable=False, unique=True, index=True)
+    email = Column(String(256), nullable=False, unique=True, index=True)
+    password = Column(String(60), nullable=False)
+    full_name = Column(String(256), nullable=False)
     gender = Column(Boolean, nullable=False)
-    dob = Column(DateTime, nullable=False)
-    phone = Column(String, nullable=False)
+    dob = Column(Date, nullable=False)
+    phone = Column(String(256), nullable=False)
     address = Column(Text, nullable=False)
     bio = Column(Text, nullable=False)
-    avatar = Column(String, nullable=False)
-    role = Column(String, nullable=False)
+    avatar = Column(Text)
+    role = Column(String(256), nullable=False)
 
     @classmethod
     async def create(cls, attrs: dict) -> str:
-        attrs["role"] = UserRole.USER
+        attrs["role"] = UserRole.ADMIN
         return await super().create(attrs)
 
     @classmethod
@@ -44,3 +45,12 @@ class UserCrud(Crud, Base):
     @classmethod
     async def exist_by_email(cls, email: str):
         return await cls.find_by_email(email) is not None
+
+    @classmethod
+    async def find_all(cls, search:str, roles:list[str], limit, offset):
+        return await cls.db.fetch_all(
+            select(cls)
+                .where((cls.full_name.contains(search)) & (cls.role.in_(roles)))
+                .limit(limit)
+                .offset(offset)
+        )

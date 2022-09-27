@@ -1,4 +1,6 @@
-from .base import BaseModel, CommonAttrs, datetime
+from datetime import date
+
+from .base import BaseModel, CommonAttrs
 
 
 class UserCreate(BaseModel):
@@ -8,20 +10,18 @@ class UserCreate(BaseModel):
 
     full_name: str
     gender: bool
-    dob: datetime
+    dob: date
     phone: str
     address: str
     bio: str
-    avatar: str
 
 class UserUpdate(BaseModel):
     full_name: str
     gender: bool
-    dob: datetime
+    dob: date
     phone: str
     address: str
     bio: str
-    avatar: str
 
 class UserChangePassword(BaseModel):
     old_password: str
@@ -33,9 +33,8 @@ class User(CommonAttrs, BaseModel):
 
     full_name: str
     gender: bool
-    dob: datetime
+    dob: date
     phone: str
     address: str
     bio: str
-    avatar: str
     role: str

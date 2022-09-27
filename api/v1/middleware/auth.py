@@ -1,5 +1,5 @@
-import os
 from datetime import datetime, timedelta
+from os import getenv
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -8,12 +8,13 @@ from passlib.context import CryptContext
 
 from ..database.base import Crud
 from ..database.user import UserCrud
-from ..exception.http import CredentialException, ForbiddenException, NotFoundException
+from ..exception.http import (CredentialException, ForbiddenException,
+                              NotFoundException)
 from ..schema.user import User
 
-SECRET_KEY = os.getenv("SECRET_KEY", "secret")
+SECRET_KEY = getenv("JWT_SECRET_KEY", "secret")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_HOURS = 24
 
 pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -29,7 +30,7 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(
         {
             **data,
-            "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS),
         },
         key=SECRET_KEY,
         algorithm=ALGORITHM
@@ -57,14 +58,16 @@ def require_owner(crud: Crud):
         return obj
     return func
 
-def require_roles():
-    pass
-
-def require_owner_or_roles(crud: Crud, roles: tuple):
-    async def func(obj = Depends(crud.find_by_id), user: User = Depends(get_current_user)):
-        if obj is None:
-            raise NotFoundException()
-        if obj.user_id != user.id and user.role not in roles:
+def require_roles(*roles):
+    async def func(user: User = Depends(get_current_user)):
+        if user.role not in roles:
             raise ForbiddenException()
-        return obj
+        return user
+    return func
+
+def exclude_roles(*roles):
+    async def func(user: User = Depends(get_current_user)):
+        if user.role in roles:
+            raise ForbiddenException()
+        return user
     return func
