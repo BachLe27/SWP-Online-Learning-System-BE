@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Date, String, Text, select
+from sqlalchemy import Boolean, Column, Date, String, Text, select, update
 
 from .base import Base, Crud
 
@@ -9,6 +9,7 @@ class UserRole:
     EXPERT = "EXPERT"
     USER = "USER"
     ALL = [ADMIN, STAFF, EXPERT, USER]
+
 
 class UserCrud(Crud, Base):
     __tablename__ = "Users"
@@ -51,6 +52,9 @@ class UserCrud(Crud, Base):
         return await cls.db.fetch_all(
             select(cls)
                 .where((cls.full_name.contains(search)) & (cls.role.in_(roles)))
-                .limit(limit)
-                .offset(offset)
+                .limit(limit).offset(offset)
         )
+
+    @classmethod
+    async def change_role_by_id(cls, id: str, role: str):
+        return await cls.db.execute(update(cls).values(role=role).where(cls.id == id))

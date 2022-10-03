@@ -42,10 +42,6 @@ class Crud:
         return await cls.db.fetch_all(select(cls).limit(limit).offset(offset).where(attr == value))
 
     @classmethod
-    async def find_all_by_user_id(cls, id: str, limit, offset):
-        return await cls.find_all_by_attr(cls.user_id, id, limit, offset)
-
-    @classmethod
     async def find_all(cls, limit, offset):
         return await cls.db.fetch_all(select(cls).limit(limit).offset(offset))
 
