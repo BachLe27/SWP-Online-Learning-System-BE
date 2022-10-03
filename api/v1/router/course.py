@@ -38,7 +38,7 @@ async def create_course_chapter(id: str, data: ChapterCreate, _ = Depends(requir
     })}
 
 
-@course_router.get("/{id}/learner", response_model=list[User], tags=["User", "Course"])
+@course_router.get("/{id}/learner", response_model=list[User], tags=["Profile", "Course"])
 async def read_course_learners(id: str, search: str = "", limit: int = 10, offset: int = 0):
     return await UserCourseCrud.find_all_users_by_course_id(id, search, limit, offset)
 
@@ -61,12 +61,12 @@ async def delete_course(id: str, _ = Depends(require_roles(UserRole.ADMIN, UserR
     return {"detail": await CourseCrud.delete_by_id(id)}
 
 
-@course_router.get("/enrolled", response_model=list[Course], tags=["User", "Course"])
+@course_router.get("/enrolled", response_model=list[Course], tags=["Profile", "Course"])
 async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int = 0, user: User = Depends(get_current_user)):
     return await UserCourseCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
 
 
-@course_router.post("/{id}/enroll", response_model=Detail, tags=["User", "Course"])
+@course_router.post("/{id}/enroll", response_model=Detail, tags=["Profile", "Course"])
 async def enroll_course(id: str, user: User = Depends(get_current_user)):
     return {"detail": await UserCourseCrud.create({
         "user_id": user.id,

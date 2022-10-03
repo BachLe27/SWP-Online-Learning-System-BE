@@ -16,7 +16,7 @@ class CourseCrud(Crud, Base):
 
     @classmethod
     async def find_all(cls, search: str, limit: int, offset: int):
-        return await cls.db.fetch_all(
+        return await cls.fetch_all(
             select(cls)
                 .where(cls.title.contains(search))
                 .limit(limit).offset(offset)

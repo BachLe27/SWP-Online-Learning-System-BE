@@ -5,15 +5,15 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import init_database
+from .database import create_admin, create_tables
 from .router import *
-
 
 app = FastAPI()
 
 
 async def startup():
-    await init_database()
+    await create_tables()
+    await create_admin()
 
 
 app.add_middleware(

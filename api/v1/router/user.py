@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..database.user import UserCrud, UserRole
-from ..exception.http import NotFoundException
-from ..middleware.auth import exclude_roles, get_current_user, require_existed, require_roles
+from ..middleware.auth import get_current_user, require_existed, require_roles
 from ..middleware.query import parse_user_roles
 from ..schema.base import Detail
 from ..schema.user import User, UserChangePassword, UserChangeRole, UserCreate, UserUpdate
@@ -19,7 +18,6 @@ async def read_all_profiles(
         roles: list[str] = Depends(parse_user_roles),
         limit: int = 10,
         offset: int = 0,
-        # _ = Depends(exclude_roles(UserRole.USER))
     ):
     return await UserCrud.find_all(search, roles, limit, offset)
 
@@ -37,9 +35,10 @@ async def create_profile(data: UserCreate):
 
 @user_router.get("/activate", response_model=Detail, tags=["Profile", "Auth"])
 async def activate_profile(token: str):
-    if not await activate_user(token):
+    id = await activate_user(token)
+    if id is None:
         raise HTTPException(status_code=400, detail="Invalid token")
-    return {"detail": "Account activated"}
+    return {"detail": id}
 
 
 @user_router.get("/me", response_model=User, tags=["Profile"])

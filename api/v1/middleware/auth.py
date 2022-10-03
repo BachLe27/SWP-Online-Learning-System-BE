@@ -12,17 +12,18 @@ from ..exception.http import (CredentialException, ForbiddenException,
 from ..schema.user import User
 
 
-SECRET_KEY = getenv("JWT_SECRET_KEY", "secret")
+SECRET_KEY = getenv("JWT_SECRET_KEY", "SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def create_access_token(data: dict) -> str:
+def create_access_token(data: dict, type: str) -> str:
     return jwt.encode(
         {
             **data,
+            "type": type,
             "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS),
         },
         key=SECRET_KEY,
@@ -39,8 +40,8 @@ def decode_access_token(token: str) -> dict:
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     payload = decode_access_token(token)
-    user_id: str = payload.get("id")
-    if user_id is None:
+    user_id = payload.get("id")
+    if user_id is None or payload["type"] != "access":
         raise CredentialException()
     user = await UserCrud.find_by_id(user_id)
     if user is None:

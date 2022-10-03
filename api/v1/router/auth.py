@@ -16,6 +16,6 @@ async def login(data: OAuth2PasswordRequestForm = Depends()):
     if user is None or not verify_password(data.password, user.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
     return {
-        "access_token": create_access_token({"id": user.id}),
+        "access_token": create_access_token({"id": user.id}, "access"),
         "token_type": "bearer",
     }

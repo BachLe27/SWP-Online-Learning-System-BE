@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Boolean, Column, Date, String, Text, select, update
 
 from .base import Base, Crud
@@ -28,16 +30,31 @@ class UserCrud(Crud, Base):
 
     @classmethod
     async def create(cls, attrs: dict) -> str:
-        attrs["role"] = UserRole.ADMIN
+        attrs["role"] = UserRole.USER
         return await super().create(attrs)
 
     @classmethod
+    async def create_admin(cls, username: str, password: str, email: str) -> str:
+        return await super().create({
+            "username" : username,
+            "password" : password,
+            "email" : email,
+            "full_name" : "",
+            "gender" : True,
+            "dob" : datetime.utcnow(),
+            "phone" : "",
+            "address" : "",
+            "bio" : "",
+            "role" : UserRole.ADMIN,
+        })
+
+    @classmethod
     async def find_by_username(cls, username: str):
-        return await cls.db.fetch_one(select(cls).where(cls.username == username))
+        return await cls.fetch_one(select(cls).where(cls.username == username))
 
     @classmethod
     async def find_by_email(cls, email: str):
-        return await cls.db.fetch_one(select(cls).where(cls.email == email))
+        return await cls.fetch_one(select(cls).where(cls.email == email))
 
     @classmethod
     async def exist_by_username(cls, username: str):
@@ -49,7 +66,7 @@ class UserCrud(Crud, Base):
 
     @classmethod
     async def find_all(cls, search:str, roles:list[str], limit, offset):
-        return await cls.db.fetch_all(
+        return await cls.fetch_all(
             select(cls)
                 .where((cls.full_name.contains(search)) & (cls.role.in_(roles)))
                 .limit(limit).offset(offset)
@@ -57,4 +74,4 @@ class UserCrud(Crud, Base):
 
     @classmethod
     async def change_role_by_id(cls, id: str, role: str):
-        return await cls.db.execute(update(cls).values(role=role).where(cls.id == id))
+        return await cls.execute(update(cls).values(role=role).where(cls.id == id))
