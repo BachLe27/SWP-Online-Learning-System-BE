@@ -73,5 +73,5 @@ async def change_password(data: UserChangePassword, user: User = Depends(get_cur
 
 @user_router.put("/{id}/change_role", response_model=Detail, tags=["Admin", "Auth"])
 async def change_user_role(data: UserChangeRole, user: User = Depends(require_existed(UserCrud)), _ = Depends(require_roles(UserRole.ADMIN))):
-    await UserCrud.update_by_id(user.id, data.role)
+    await UserCrud.update_role_by_id(user.id, data.role)
     return {"detail": "Updated"}

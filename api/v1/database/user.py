@@ -73,5 +73,5 @@ class UserCrud(Crud, Base):
         )
 
     @classmethod
-    async def change_role_by_id(cls, id: str, role: str):
+    async def update_role_by_id(cls, id: str, role: str):
         return await cls.execute(update(cls).values(role=role).where(cls.id == id))

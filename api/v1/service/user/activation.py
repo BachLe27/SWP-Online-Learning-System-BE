@@ -1,3 +1,4 @@
+from datetime import date
 from ...database.user import UserCrud
 from ...middleware.auth import create_access_token, decode_access_token
 from ..mailing import send_email
@@ -20,4 +21,5 @@ async def activate_user(token: str) -> str | None:
         return
     del data["type"]
     del data["exp"]
+    data["dob"] = date.fromisoformat(data["dob"])
     return await UserCrud.create(data)
