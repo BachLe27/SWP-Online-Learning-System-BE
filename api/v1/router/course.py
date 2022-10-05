@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
+
+from api.v1.middleware.query import parse_course_levels
 
 from ..database.chapter import ChapterCrud
 from ..database.course import CourseCrud
@@ -10,13 +12,17 @@ from ..schema.chapter import Chapter, ChapterCreate
 from ..schema.course import Course, CourseCreate, CourseUpdate
 from ..schema.user import User
 
-
 course_router = APIRouter()
 
 
 @course_router.get("", response_model=list[Course], tags=["Course"])
-async def read_all_courses(search: str = "", limit: int = 10, offset: int = 0):
-    return await CourseCrud.find_all(search, limit, offset)
+async def read_all_courses(
+        search: str = "",
+        levels: list[str] = Depends(parse_course_levels),
+        limit: int = 10,
+        offset: int = 0
+    ):
+    return await CourseCrud.find_all(search, levels, limit, offset)
 
 
 @course_router.get("/{id}", response_model=Course, tags=["Course"])
@@ -54,6 +60,11 @@ async def create_course(data: CourseCreate, user: User = Depends(require_roles(U
 @course_router.put("/{id}", response_model=Detail, tags=["Admin", "Expert", "Course"])
 async def update_course(id: str, data: CourseUpdate, _ = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))):
     return {"detail": await CourseCrud.update_by_id(id, data.dict(exclude_none=True))}
+
+
+@course_router.put("/{id}/image", response_model=Detail, tags=["Admin", "Expert", "Course"])
+async def update_course_image(id: str, image: UploadFile, _ = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))):
+    pass
 
 
 @course_router.delete("/{id}", response_model=Detail, tags=["Admin", "Expert", "Course"])

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from sqlalchemy import Boolean, Column, Date, String, Text, select, update
 
@@ -41,7 +41,7 @@ class UserCrud(Crud, Base):
             "email" : email,
             "full_name" : "",
             "gender" : True,
-            "dob" : datetime.utcnow(),
+            "dob" : date.today(),
             "phone" : "",
             "address" : "",
             "bio" : "",
@@ -65,7 +65,7 @@ class UserCrud(Crud, Base):
         return await cls.find_by_email(email) is not None
 
     @classmethod
-    async def find_all(cls, search:str, roles:list[str], limit, offset):
+    async def find_all(cls, search:str, roles:list[str], limit: int, offset: int):
         return await cls.fetch_all(
             select(cls)
                 .where((cls.full_name.contains(search)) & (cls.role.in_(roles)))

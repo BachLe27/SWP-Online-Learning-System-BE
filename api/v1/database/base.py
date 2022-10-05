@@ -7,6 +7,7 @@ from sqlalchemy import Column, DateTime, String, delete, insert, select, update
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
+
 DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:///database.db")
 
 engine = create_async_engine(DATABASE_URL)
@@ -49,11 +50,11 @@ class Crud:
         return await cls.fetch_one(select(cls).where(cls.id == id))
 
     @classmethod
-    async def find_all_by_attr(cls, attr, value, limit, offset):
+    async def find_all_by_attr(cls, attr, value, limit: int, offset: int):
         return await cls.fetch_all(select(cls).limit(limit).offset(offset).where(attr == value))
 
     @classmethod
-    async def find_all(cls, limit, offset):
+    async def find_all(cls, limit: int, offset: int):
         return await cls.fetch_all(select(cls).limit(limit).offset(offset))
 
     @classmethod

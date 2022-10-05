@@ -2,13 +2,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from os import getenv
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import create_admin, create_tables
+from .database import create_tables, UserCrud
 from .router import *
+from .service.user import hash_password
+
 
 app = FastAPI()
+
+
+async def create_admin():
+    username = getenv("ADMIN_USERNAME", "admin")
+    password = hash_password(getenv("ADMIN_PASSWORD", "admin"))
+    email = getenv("ADMIN_EMAIL", "admin@email.com")
+    if not await UserCrud.exist_by_username(username) and not await UserCrud.exist_by_email(email):
+        await UserCrud.create_admin(username, password, email)
 
 
 async def startup():

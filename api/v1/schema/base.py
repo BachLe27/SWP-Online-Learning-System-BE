@@ -8,8 +8,10 @@ class CommonAttrs(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+
 class Detail(BaseModel):
     detail: str
+
 
 class Token(BaseModel):
     access_token: str

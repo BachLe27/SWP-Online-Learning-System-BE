@@ -10,13 +10,13 @@ class UserCreate(BaseModel):
     username: str
     password: str
     email: EmailStr
-
     full_name: str
     gender: bool
     dob: date
     phone: str
     address: str
     bio: str
+
 
 class UserUpdate(BaseModel):
     full_name: str | None
@@ -26,9 +26,11 @@ class UserUpdate(BaseModel):
     address: str | None
     bio: str | None
 
+
 class UserChangePassword(BaseModel):
     old_password: str
     new_password: str
+
 
 class UserChangeRole(BaseModel):
     role: str
@@ -39,10 +41,10 @@ class UserChangeRole(BaseModel):
             raise ValueError(f"Role must be one of {UserRole.ALL}")
         return v
 
+
 class User(CommonAttrs):
     username: str
     email: EmailStr
-
     full_name: str
     gender: bool
     dob: date

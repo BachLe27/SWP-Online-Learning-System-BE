@@ -1,4 +1,5 @@
 from datetime import date
+
 from ...database.user import UserCrud
 from ...middleware.auth import create_access_token, decode_access_token
 from ..mailing import send_email
@@ -11,7 +12,7 @@ http://localhost:8000/api/v1/user/activate?token={token}
 
 async def send_activation_email(data: dict):
     email = data["email"]
-    data["dob"] = str(data["dob"])
+    data["dob"] = data["dob"].isoformat()
     await send_email(email, "Activate your account", activation_mail.format(token=create_access_token(data, "activation")))
 
 
