@@ -9,10 +9,10 @@ fm = FastMail(
         MAIL_FROM = getenv("MAIL_DEFAULT_SENDER"),
         MAIL_SERVER = getenv("MAIL_SERVER", "smtp.gmail.com"),
         MAIL_PORT = getenv("MAIL_PORT", 465),
-        MAIL_TLS = getenv("MAIL_USE_TLS", False),
-        MAIL_SSL = getenv("MAIL_USE_SSL", True),
-        USE_CREDENTIALS = getenv("MAIL_USE_CREDENTIALS", True),
-        VALIDATE_CERTS = getenv("MAIL_VALIDATE_CERTS", True),
+        MAIL_TLS = getenv("MAIL_USE_TLS", "False") == "True",
+        MAIL_SSL = getenv("MAIL_USE_SSL", "True") == "True",
+        USE_CREDENTIALS = getenv("MAIL_USE_CREDENTIALS", "True") == "True",
+        VALIDATE_CERTS = getenv("MAIL_VALIDATE_CERTS", "True") == "True",
     )
 )
 

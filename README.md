@@ -1,13 +1,9 @@
 # SWP Online Learning System BE
 
-1. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+1. Install dependencies `pip install -r requirements.txt`
 
-2. Run
-```bash
-python main.py
-```
+2. Edit `api/v1/.env.example` and copy to `.env`
 
-3. View API docs at http://localhost:8000/api/v1/docs
+3. Run `python main.py`
+
+4. View API docs at http://localhost:8000/docs
