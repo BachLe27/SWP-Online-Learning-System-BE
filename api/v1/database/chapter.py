@@ -9,8 +9,7 @@ class ChapterCrud(Crud, Base):
     title = Column(String(256), nullable=False)
     description = Column(Text, nullable=False)
     course_id = Column(String(36), ForeignKey("Courses.id"), nullable=False)
-    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
-    async def find_all_by_course_id(cls, id: str, limit: int, offset: int):
-        return await cls.find_all_by_attr(cls.course_id, id, limit, offset)
+    async def find_all_by_course_id(cls, limit: int, offset: int, course_id: str):
+        return await cls.find_all_by_attr(cls.course_id, course_id, limit, offset)

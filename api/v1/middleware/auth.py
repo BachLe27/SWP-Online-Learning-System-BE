@@ -57,6 +57,16 @@ def require_existed(crud: Crud):
     return func
 
 
+def require_author(crud: Crud):
+    async def func(obj = Depends(crud.find_by_id), user: User = Depends(get_current_user)):
+        if obj is None:
+            raise NotFoundException()
+        if obj.author_id != user.id:
+            raise ForbiddenException()
+        return obj
+    return func
+
+
 def require_roles(*roles):
     async def func(user: User = Depends(get_current_user)):
         if user.role not in roles:

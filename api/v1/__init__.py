@@ -1,3 +1,4 @@
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -7,7 +8,7 @@ from os import getenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import create_tables, UserCrud
+from .database import UserCrud, create_tables
 from .router import *
 from .service.user import hash_password
 
@@ -23,6 +24,7 @@ async def create_admin():
         await UserCrud.create_admin(username, password, email)
 
 
+@app.on_event("startup")
 async def startup():
     await create_tables()
     await create_admin()

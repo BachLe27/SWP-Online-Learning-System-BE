@@ -29,3 +29,11 @@ class CourseCrud(Crud, Base):
                 .where(cls.title.contains(search) & cls.level.in_(levels))
                 .limit(limit).offset(offset)
         )
+
+    @classmethod
+    async def find_all_by_author_id(cls, search: str, levels: list[str], limit: int, offset: int, author_id: str):
+        return await cls.fetch_all(
+            select(cls)
+                .where(cls.author_id == author_id & cls.title.contains(search) & cls.level.in_(levels))
+                .limit(limit).offset(offset)
+        )
