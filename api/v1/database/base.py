@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from databases import Database
 from sqlalchemy import Column, DateTime, String, delete, insert, select, update
+from sqlalchemy.sql.functions import count
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -38,6 +39,11 @@ class Crud:
             return await cls.db.fetch_all(query)
 
     @classmethod
+    async def fetch_val(cls, query: str):
+        async with cls.db:
+            return await cls.db.fetch_val(query)
+
+    @classmethod
     async def create(cls, attrs: dict) -> str:
         attrs["id"] = str(uuid4())
         attrs["created_at"] = datetime.utcnow()
@@ -52,6 +58,10 @@ class Crud:
     @classmethod
     async def find_all_by_attr(cls, attr, value, limit: int, offset: int):
         return await cls.fetch_all(select(cls).limit(limit).offset(offset).where(attr == value))
+
+    @classmethod
+    async def count_by_attr(cls, attr, value):
+        return await cls.fetch_val(select(count(cls.id)).where(attr == value))
 
     @classmethod
     async def find_all(cls, limit: int, offset: int):

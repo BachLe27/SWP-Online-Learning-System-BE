@@ -16,9 +16,7 @@ class CourseCrud(Crud, Base):
     title = Column(String(256), nullable=False)
     description = Column(Text, nullable=False)
     level = Column(String(256), nullable=False)
-    # rating = Column(Float, nullable=False)
-    # duration = Column(Integer, nullable=False)
-    image = Column(Text)
+    image = Column(String(36), ForeignKey("Uploads.id"))
     is_public = Column(Boolean, nullable=False)
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
@@ -26,7 +24,7 @@ class CourseCrud(Crud, Base):
     async def find_all(cls, search: str, levels: list[str], limit: int, offset: int):
         return await cls.fetch_all(
             select(cls)
-                .where(cls.title.contains(search) & cls.level.in_(levels))
+                .where((cls.title.contains(search)) & (cls.level.in_(levels)))
                 .limit(limit).offset(offset)
         )
 
@@ -34,6 +32,6 @@ class CourseCrud(Crud, Base):
     async def find_all_by_author_id(cls, search: str, levels: list[str], limit: int, offset: int, author_id: str):
         return await cls.fetch_all(
             select(cls)
-                .where(cls.author_id == author_id & cls.title.contains(search) & cls.level.in_(levels))
+                .where((cls.author_id == author_id) & (cls.title.contains(search)) & (cls.level.in_(levels)))
                 .limit(limit).offset(offset)
         )

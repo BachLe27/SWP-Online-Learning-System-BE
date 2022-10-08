@@ -36,10 +36,10 @@ class UserChangeRole(BaseModel):
     role: str
 
     @validator("role")
-    def validate_role(cls, v):
-        if v not in UserRole.ALL:
+    def validate_role(cls, role):
+        if role not in UserRole.ALL:
             raise ValueError(f"Role must be one of {UserRole.ALL}")
-        return v
+        return role
 
 
 class User(CommonAttrs):

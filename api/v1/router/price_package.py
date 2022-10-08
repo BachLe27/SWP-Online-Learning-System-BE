@@ -27,12 +27,12 @@ async def create_price_package(data: PricePackageCreate):
 
 
 @price_package_router.put("/{id}", response_model=Detail, **auth_middleware)
-async def update_price_package(data: PricePackageUpdate, price_package: PricePackage = Depends(require_existed(PricePackageCrud))):
+async def update_price_package_by_id(data: PricePackageUpdate, price_package: PricePackage = Depends(require_existed(PricePackageCrud))):
     await PricePackageCrud.update_by_id(price_package.id, data.dict())
     return {"detail": "Updated"}
 
 
 @price_package_router.delete("/{id}", response_model=Detail, **auth_middleware)
-async def delete_price_package(price_package: PricePackage = Depends(require_existed(PricePackageCrud))):
+async def delete_price_package_by_id(price_package: PricePackage = Depends(require_existed(PricePackageCrud))):
     await PricePackageCrud.delete_by_id(price_package.id)
     return {"detail": "Deleted"}

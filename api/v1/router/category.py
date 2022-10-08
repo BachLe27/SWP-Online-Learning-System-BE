@@ -26,12 +26,12 @@ async def create_category(data: CategoryCreate):
 
 
 @category_router.put("/{id}", response_model=Detail, **auth_middleware)
-async def update_category(data: CategoryUpdate, category: Category = Depends(require_existed(CategoryCrud))):
+async def update_category_by_id(data: CategoryUpdate, category: Category = Depends(require_existed(CategoryCrud))):
     await CategoryCrud.update_by_id(category.id, data.dict())
     return {"detail": "Updated"}
 
 
 @category_router.delete("/{id}", response_model=Detail, **auth_middleware)
-async def delete_category(category: Category = Depends(require_existed(CategoryCrud))):
+async def delete_category_by_id(category: Category = Depends(require_existed(CategoryCrud))):
     await CategoryCrud.delete_by_id(category.id)
     return {"detail": "Deleted"}

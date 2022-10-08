@@ -13,3 +13,7 @@ class ChapterCrud(Crud, Base):
     @classmethod
     async def find_all_by_course_id(cls, limit: int, offset: int, course_id: str):
         return await cls.find_all_by_attr(cls.course_id, course_id, limit, offset)
+
+    @classmethod
+    async def count_by_course_id(cls, course_id: str):
+        return await cls.count_by_attr(cls.course_id, course_id)

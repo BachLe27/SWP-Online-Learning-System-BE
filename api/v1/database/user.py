@@ -1,6 +1,7 @@
 from datetime import date
 
-from sqlalchemy import Boolean, Column, Date, String, Text, select, update
+from sqlalchemy import (Boolean, Column, Date, ForeignKey, String, Text,
+                        select, update)
 
 from .base import Base, Crud
 
@@ -25,8 +26,8 @@ class UserCrud(Crud, Base):
     phone = Column(String(256), nullable=False)
     address = Column(Text, nullable=False)
     bio = Column(Text, nullable=False)
-    avatar = Column(Text)
     role = Column(String(256), nullable=False)
+    avatar = Column(String(36), ForeignKey("Uploads.id"))
 
     @classmethod
     async def create(cls, attrs: dict) -> str:

@@ -1,4 +1,6 @@
 .vscode/
+upload/
+
 test.py
 database.db
 

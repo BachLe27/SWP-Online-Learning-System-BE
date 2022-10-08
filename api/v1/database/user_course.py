@@ -27,3 +27,7 @@ class UserCourseCrud(Crud, Base):
                 .where(cls.course_id == course_id and UserCrud.full_name.contains(search))
                 .limit(limit).offset(offset)
         )
+
+    @classmethod
+    async def count_by_course_id(cls, course_id: str):
+        return await cls.count_by_attr(cls.course_id, course_id)
