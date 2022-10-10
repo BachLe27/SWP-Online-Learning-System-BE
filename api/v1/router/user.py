@@ -81,11 +81,11 @@ async def update_profile(data: UserUpdate, user: User = Depends(get_current_user
 @user_router.put("/me/avatar", response_model=Detail, tags=["Profile"])
 async def update_avatar(file: UploadFile = Depends(validate_image), user: User = Depends(get_current_user)):
     id = await UploadCrud.create({
-        "file_path": "upload/{id}",
+        "file_path": "{id}",
         "content_type": file.content_type,
         "author_id": user.id,
     })
-    if not await upload_file(file, f"upload/{id}"):
+    if not await upload_file(file, f"{id}"):
         await UploadCrud.delete_by_id(id)
         raise HTTPException(status_code=500, detail="Upload failed")
     await UserCrud.update_by_id(user.id, {"avatar": id})

@@ -70,11 +70,11 @@ async def read_course_image_by_id(course: Course = Depends(require_existed(Cours
 @course_router.put("/{id}/image", response_model=Detail, tags=["Admin", "Expert", "Course"])
 async def update_course_image_by_id(file: UploadFile = Depends(validate_image), course: Course = Depends(require_author(CourseCrud))):
     id = await UploadCrud.create({
-        "file_path": "upload/{id}",
+        "file_path": "{id}",
         "content_type": file.content_type,
         "author_id": course.author_id,
     })
-    if not await upload_file(file, f"upload/{id}"):
+    if not await upload_file(file, f"{id}"):
         await UploadCrud.delete_by_id(id)
         raise HTTPException(status_code=500, detail="Upload failed")
     await CourseCrud.update_by_id(course.id, {"image": id})
