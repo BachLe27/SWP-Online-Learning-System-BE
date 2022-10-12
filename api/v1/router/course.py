@@ -91,7 +91,7 @@ async def read_course_overview_by_id(course: Course = Depends(require_existed(Co
 
 @course_router.get("/{id}/chapter", response_model=list[Chapter], tags=["Course", "Chapter"])
 async def read_course_chapters_by_id(limit: int = 10, offset: int = 0, course: Course = Depends(require_existed(CourseCrud))):
-    return await ChapterCrud.find_all_by_course_id(course.id, limit, offset)
+    return await ChapterCrud.find_all_by_course_id(limit, offset, course.id)
 
 
 @course_router.post("/{id}/chapter", response_model=Detail, tags=["Admin", "Expert", "Course", "Chapter"])
