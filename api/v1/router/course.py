@@ -44,7 +44,7 @@ async def read_created_courses(
 
 @course_router.get("/enrolled", response_model=list[Course], tags=["Course"])
 async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int = 0, user: User = Depends(get_current_user)):
-    return await UserCourseCrud.find_all_courses_by_user_id(search, limit, offset, user.id)
+    return await UserCourseCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
 
 
 @course_router.post("", response_model=Detail, tags=["Admin", "Expert", "Course"])
@@ -85,13 +85,16 @@ async def update_course_image_by_id(file: UploadFile = Depends(validate_image), 
 async def read_course_overview_by_id(course: Course = Depends(require_existed(CourseCrud))):
     return {
         "chapters_count": await ChapterCrud.count_by_course_id(course.id),
-        "learners_count": await UserCourseCrud.count_by_course_id(course.id)
+        "learners_count": await UserCourseCrud.count_by_course_id(course.id),
+        "duration": 0,
+        "rating": 0,
+        "rating_count": 0,
     }
 
 
 @course_router.get("/{id}/chapter", response_model=list[Chapter], tags=["Course", "Chapter"])
 async def read_course_chapters_by_id(limit: int = 10, offset: int = 0, course: Course = Depends(require_existed(CourseCrud))):
-    return await ChapterCrud.find_all_by_course_id(limit, offset, course.id)
+    return await ChapterCrud.find_all_by_course_id(course.id, limit, offset)
 
 
 @course_router.post("/{id}/chapter", response_model=Detail, tags=["Admin", "Expert", "Course", "Chapter"])
@@ -99,12 +102,13 @@ async def create_course_chapter_by_id(data: ChapterCreate, course: Course = Depe
     return {"detail": await ChapterCrud.create({
         **data.dict(),
         "course_id": course.id,
+        "author_id": course.author_id
     })}
 
 
 @course_router.get("/{id}/learner", response_model=list[User], tags=["Course"])
 async def read_course_learners_by_id(search: str = "", limit: int = 10, offset: int = 0, course: Course = Depends(require_existed(CourseCrud))):
-    return await UserCourseCrud.find_all_users_by_course_id(search, limit, offset, course.id)
+    return await UserCourseCrud.find_all_users_by_course_id(course.id, search, limit, offset)
 
 
 @course_router.put("/{id}", response_model=Detail, tags=["Admin", "Expert", "Course"])

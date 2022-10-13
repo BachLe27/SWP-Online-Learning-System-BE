@@ -13,7 +13,7 @@ class UserCourseCrud(Crud, Base):
     # completion_date = Column(DateTime, nullable=True)
 
     @classmethod
-    async def find_all_courses_by_user_id(cls, search: str, limit: int, offset: int, user_id: str):
+    async def find_all_courses_by_user_id(cls, user_id: str, search: str, limit: int, offset: int):
         return await cls.fetch_all(
             select(cls, CourseCrud)
                 .where(cls.user_id == user_id and CourseCrud.title.contains(search))
@@ -21,7 +21,7 @@ class UserCourseCrud(Crud, Base):
         )
 
     @classmethod
-    async def find_all_users_by_course_id(cls, search:str, limit: int, offset: int, course_id: str):
+    async def find_all_users_by_course_id(cls, course_id: str, search:str, limit: int, offset: int):
         return await cls.fetch_all(
             select(cls, CourseCrud)
                 .where(cls.course_id == course_id and UserCrud.full_name.contains(search))

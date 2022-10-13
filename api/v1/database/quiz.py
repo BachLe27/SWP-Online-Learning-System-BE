@@ -11,3 +11,4 @@ class QuizCrud(Crud, Base):
     description = Column(Text, nullable=False)
     is_public = Column(Boolean, nullable=False)
     lesson_id = Column(String(36), ForeignKey("Lessons.id"), nullable=False)
+    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)

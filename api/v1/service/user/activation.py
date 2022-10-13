@@ -6,7 +6,7 @@ from ..mailing import send_email
 
 
 activation_mail = """
-http://localhost:8000/api/v1/user/activate?token={token}
+http://localhost:8000/user/activate?token={token}
 """
 
 

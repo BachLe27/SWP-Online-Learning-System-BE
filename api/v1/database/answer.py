@@ -9,3 +9,4 @@ class AnswerCrud(Crud, Base):
     content = Column(Text, nullable=False)
     is_correct = Column(Boolean, nullable=False)
     question_id = Column(String(36), ForeignKey("Questions.id"), nullable=False)
+    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)

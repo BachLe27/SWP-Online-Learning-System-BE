@@ -18,7 +18,7 @@ async def upload_file(file: UploadFile, path: str|Path) -> bool:
                 await f.write(chunk)
         return True
     except Exception as e:
-        # print(e)
+        print(e)
         return False
 
 
