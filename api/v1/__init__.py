@@ -1,4 +1,5 @@
 from pathlib import Path
+from unicodedata import category
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -39,6 +40,8 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/token")
 app.include_router(user_router, prefix="/user")
+app.include_router(category_router, prefix="/category")
 app.include_router(course_router, prefix="/course")
 app.include_router(chapter_router, prefix="/chapter")
+app.include_router(lesson_router, prefix="/lesson")
 app.include_router(upload_router, prefix="/upload")

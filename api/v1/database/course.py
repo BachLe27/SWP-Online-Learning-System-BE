@@ -18,6 +18,7 @@ class CourseCrud(Crud, Base):
     level = Column(String(256), nullable=False)
     image = Column(String(36), ForeignKey("Uploads.id"))
     is_public = Column(Boolean, nullable=False)
+    category_id = Column(String(36), ForeignKey("Categories.id"), nullable=False)
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
