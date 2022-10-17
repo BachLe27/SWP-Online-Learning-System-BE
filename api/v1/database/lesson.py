@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Text, Integer
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, select
 
 from .base import Base, Crud
 
@@ -15,7 +15,12 @@ class LessonCrud(Crud, Base):
 
     @classmethod
     async def find_all_by_chapter_id(cls, chapter_id: str, limit: int, offset: int):
-        return await cls.find_all_by_attr(cls.chapter_id, chapter_id, limit, offset)
+        return await cls.fetch_all(
+            select(cls)
+                .where(cls.chapter_id == chapter_id)
+                .order_by(cls.updated_at)
+                .limit(limit).offset(offset)
+        )
 
     @classmethod
     async def count_by_chapter_id(cls, chapter_id: str):

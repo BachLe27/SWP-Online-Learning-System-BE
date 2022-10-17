@@ -14,7 +14,7 @@ class CourseCreate(BaseModel):
     @validator("level")
     def validate_level(cls, level):
         if level not in CourseLevel.ALL:
-            raise ValueError(f"Role must be one of {CourseLevel.ALL}")
+            raise ValueError(f"Level must be one of {CourseLevel.ALL}")
         return level
 
 
@@ -28,7 +28,7 @@ class CourseUpdate(BaseModel):
     @validator("level")
     def validate_level(cls, level):
         if level not in CourseLevel.ALL:
-            raise ValueError(f"Role must be one of {CourseLevel.ALL}")
+            raise ValueError(f"Level must be one of {CourseLevel.ALL}")
         return level
 
 

@@ -57,8 +57,11 @@ class Crud:
 
     @classmethod
     async def find_all_by_attr(cls, attr, value, limit: int, offset: int):
-        return await cls.fetch_all(select(cls).limit(limit).offset(offset).where(attr == value))
+        return await cls.fetch_all(select(cls).where(attr == value).limit(limit).offset(offset))
 
+    @classmethod
+    async def find_all_by_attr_no_limit(cls, attr, value):
+        return await cls.fetch_all(select(cls).where(attr == value))
     @classmethod
     async def count_by_attr(cls, attr, value):
         return await cls.fetch_val(select(count(cls.id)).where(attr == value))

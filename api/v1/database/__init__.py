@@ -6,7 +6,6 @@ from .lesson import LessonCrud
 from .price_package import PricePackageCrud
 from .purchase import PurchaseCrud
 from .question import QuestionCrud
-from .quiz import QuizCrud
 from .upload import UploadCrud
 from .user import UserCrud, UserRole
 from .user_answer import UserAnswerCrud

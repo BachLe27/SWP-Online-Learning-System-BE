@@ -9,4 +9,7 @@ class AnswerCrud(Crud, Base):
     content = Column(Text, nullable=False)
     is_correct = Column(Boolean, nullable=False)
     question_id = Column(String(36), ForeignKey("Questions.id"), nullable=False)
-    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
+
+    @classmethod
+    async def find_all_by_question_id_no_linit(cls, question_id: str):
+        return await cls.find_all_by_attr_no_limit(cls.question_id, question_id)
