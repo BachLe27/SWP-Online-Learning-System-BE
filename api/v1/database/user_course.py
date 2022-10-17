@@ -15,16 +15,16 @@ class UserCourseCrud(Crud, Base):
     @classmethod
     async def find_all_courses_by_user_id(cls, user_id: str, search: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls, CourseCrud)
-                .where(cls.user_id == user_id and CourseCrud.title.contains(search))
+            select(cls)
+                .where((cls.user_id == user_id) & (CourseCrud.title.contains(search)))
                 .limit(limit).offset(offset)
         )
 
     @classmethod
     async def find_all_users_by_course_id(cls, course_id: str, search:str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls, CourseCrud)
-                .where(cls.course_id == course_id and UserCrud.full_name.contains(search))
+            select(cls)
+                .where((cls.course_id == course_id) & (UserCrud.full_name.contains(search)))
                 .limit(limit).offset(offset)
         )
 

@@ -1,22 +1,22 @@
-from fastapi import APIRouter, Depends, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
-
-from api.v1.middleware.upload import validate_image
-from ..database.upload import UploadCrud
-from ..exception.http import NotFoundException
-
-from ..middleware.query import parse_course_levels
-from ..service.storage import download_file, upload_file
 
 from ..database.chapter import ChapterCrud
 from ..database.course import CourseCrud
+from ..database.lesson import LessonCrud
+from ..database.upload import UploadCrud
 from ..database.user import UserRole
 from ..database.user_course import UserCourseCrud
-from ..middleware.auth import get_current_user, require_author, require_existed, require_roles
+from ..exception.http import NotFoundException
+from ..middleware.auth import (get_current_user, require_author,
+                               require_existed, require_roles)
+from ..middleware.query import parse_course_levels
+from ..middleware.upload import validate_image
 from ..schema.base import Detail
 from ..schema.chapter import Chapter, ChapterCreate
 from ..schema.course import Course, CourseCreate, CourseOverview, CourseUpdate
 from ..schema.user import User
+from ..service.storage import download_file, upload_file
 
 course_router = APIRouter()
 
@@ -31,7 +31,7 @@ async def read_all_courses(
     return await CourseCrud.find_all(search, levels, limit, offset)
 
 
-@course_router.get("/created", response_model=list[Course], tags=["Admin", "Expert", "Course"])
+@course_router.get("/created", response_model=list[Course], tags=["Expert", "Course"])
 async def read_created_courses(
         search: str = "",
         levels: list[str] = Depends(parse_course_levels),
@@ -47,7 +47,7 @@ async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int =
     return await UserCourseCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
 
 
-@course_router.post("", response_model=Detail, tags=["Admin", "Expert", "Course"])
+@course_router.post("", response_model=Detail, tags=["Expert", "Course"])
 async def create_course(data: CourseCreate, user: User = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))):
     return {"detail": await CourseCrud.create({
         **data.dict(),
@@ -67,7 +67,7 @@ async def read_course_image_by_id(course: Course = Depends(require_existed(Cours
     return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
 
 
-@course_router.put("/{id}/image", response_model=Detail, tags=["Admin", "Expert", "Course"])
+@course_router.put("/{id}/image", response_model=Detail, tags=["Expert", "Course"])
 async def update_course_image_by_id(file: UploadFile = Depends(validate_image), course: Course = Depends(require_author(CourseCrud))):
     id = await UploadCrud.create({
         "file_path": "{id}",
@@ -86,7 +86,7 @@ async def read_course_overview_by_id(course: Course = Depends(require_existed(Co
     return {
         "chapters_count": await ChapterCrud.count_by_course_id(course.id),
         "learners_count": await UserCourseCrud.count_by_course_id(course.id),
-        "duration": 0,
+        "duration": await LessonCrud.sum_duration_by_course_id(course.id),
         "rating": 0,
         "rating_count": 0,
     }
@@ -97,7 +97,7 @@ async def read_course_chapters_by_id(limit: int = 10, offset: int = 0, course: C
     return await ChapterCrud.find_all_by_course_id(course.id, limit, offset)
 
 
-@course_router.post("/{id}/chapter", response_model=Detail, tags=["Admin", "Expert", "Course", "Chapter"])
+@course_router.post("/{id}/chapter", response_model=Detail, tags=["Expert", "Course", "Chapter"])
 async def create_course_chapter_by_id(data: ChapterCreate, course: Course = Depends(require_author(CourseCrud))):
     return {"detail": await ChapterCrud.create({
         **data.dict(),
@@ -111,12 +111,12 @@ async def read_course_learners_by_id(search: str = "", limit: int = 10, offset: 
     return await UserCourseCrud.find_all_users_by_course_id(course.id, search, limit, offset)
 
 
-@course_router.put("/{id}", response_model=Detail, tags=["Admin", "Expert", "Course"])
+@course_router.put("/{id}", response_model=Detail, tags=["Expert", "Course"])
 async def update_course_by_id(data: CourseUpdate, course: Course = Depends(require_author(CourseCrud))):
     return {"detail": await CourseCrud.update_by_id(course.id, data.dict(exclude_none=True))}
 
 
-@course_router.delete("/{id}", response_model=Detail, tags=["Admin", "Expert", "Course"])
+@course_router.delete("/{id}", response_model=Detail, tags=["Expert", "Course"])
 async def delete_course_by_id(course: Course = Depends(require_author(CourseCrud))):
     return {"detail": await CourseCrud.delete_by_id(course.id)}
 

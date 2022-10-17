@@ -1,27 +1,42 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from .base import CommonAttrs
 from .lesson import Lesson
 
 
-class AnswerCreate(BaseModel):
-    content: str
-    is_correct: bool
-
-
-class Answer(BaseModel):
-    content: str
-
-
 class QuestionCreate(BaseModel):
+
+    class AnswerCreate(BaseModel):
+        content: str
+        is_correct: bool
+
     content: str
     answers : list[AnswerCreate]
 
+    @validator("answers")
+    def validate_answers(cls, answers):
+        if len(answers) < 2:
+            raise ValueError("At least 2 answers are required")
+        if not any(answer.is_correct for answer in answers):
+            raise ValueError("At least one answer must be correct")
+        return answers
+
 
 class Question(CommonAttrs):
+
+    class Answer(CommonAttrs):
+        content: str
+
     content: str
     answers : list[Answer]
+    has_more_than_one_correct_answer: bool
 
 
-class LessonQuestion(Lesson):
-    questions: list[Question]
+class QuestionAnswerCreate(BaseModel):
+    answer_ids: list[str]
+
+
+class QuestionAnswer(BaseModel):
+    is_correct: bool
+    correct_answer_ids: list[str]
+    wrong_answer_ids: list[str]

@@ -6,12 +6,10 @@ from ..middleware.auth import require_existed, require_roles
 from ..schema.base import Detail
 from ..schema.category import Category, CategoryCreate, CategoryUpdate
 
-
 auth_middleware = {
     "dependencies": [Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))],
-    "tags": ["Admin", "Expert", "Category"]
+    "tags": ["Expert", "Category"]
 }
-
 
 category_router = APIRouter()
 
@@ -19,6 +17,7 @@ category_router = APIRouter()
 @category_router.get("", response_model=list[Category], tags=["Category"])
 async def read_all_categories(limit: int = 100, offset: int = 0):
     return await CategoryCrud.find_all(limit, offset)
+
 
 @category_router.post("", response_model=Detail, **auth_middleware)
 async def create_category(data: CategoryCreate):

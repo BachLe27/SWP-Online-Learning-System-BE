@@ -86,3 +86,7 @@ class Crud:
     @classmethod
     async def delete_by_id(cls, id: str):
         return await cls.execute(delete(cls).where(cls.id == id))
+
+    @classmethod
+    async def delete_all_by_attr(cls, attr, value):
+        return await cls.execute(delete(cls).where(attr == value))

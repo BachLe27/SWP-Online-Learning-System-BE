@@ -16,7 +16,7 @@ class ChapterCrud(Crud, Base):
         return await cls.fetch_all(
             select(cls)
                 .where(cls.course_id == course_id)
-                .order_by(cls.updated_at)
+                .order_by(cls.created_at)
                 .limit(limit).offset(offset)
         )
 

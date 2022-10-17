@@ -35,6 +35,9 @@ class CourseUpdate(BaseModel):
 class CourseOverview(BaseModel):
     chapters_count: int
     learners_count: int
+    duration: int
+    rating: float
+    rating_count: int
 
 
 class Course(CommonAttrs):
