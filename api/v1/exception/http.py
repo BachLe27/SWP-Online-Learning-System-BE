@@ -16,6 +16,11 @@ class ValidationException(HTTPException):
         super().__init__(status_code=422, detail=detail)
 
 
+class ConflictException(HTTPException):
+    def __init__(self, detail: str = "Resource already exists"):
+        super().__init__(status_code=409, detail=detail)
+
+
 class CredentialException(HTTPException):
     def __init__(self):
         super().__init__(

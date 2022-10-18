@@ -3,11 +3,12 @@ from fastapi.responses import StreamingResponse
 
 from ..database.chapter import ChapterCrud
 from ..database.course import CourseCrud
+from ..database.feedback import FeedbackCrud
 from ..database.lesson import LessonCrud
 from ..database.upload import UploadCrud
 from ..database.user import UserRole
 from ..database.user_course import UserCourseCrud
-from ..exception.http import NotFoundException
+from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import (get_current_user, require_author,
                                require_existed, require_roles)
 from ..middleware.query import parse_course_levels
@@ -49,10 +50,12 @@ async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int =
 
 @course_router.post("", response_model=Detail, tags=["Expert", "Course"])
 async def create_course(data: CourseCreate, user: User = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))):
-    return {"detail": await CourseCrud.create({
-        **data.dict(),
-        "author_id": user.id
-    })}
+    return {
+        "detail": await CourseCrud.create({
+            **data.dict(),
+            "author_id": user.id
+        })
+    }
 
 @course_router.get("/{id}", response_model=Course, tags=["Course"])
 async def read_course_by_id(course: Course = Depends(require_existed(CourseCrud))):
@@ -87,8 +90,8 @@ async def read_course_overview_by_id(course: Course = Depends(require_existed(Co
         "chapters_count": await ChapterCrud.count_by_course_id(course.id),
         "learners_count": await UserCourseCrud.count_by_course_id(course.id),
         "duration": await LessonCrud.sum_duration_by_course_id(course.id),
-        "rating": 0,
-        "rating_count": 0,
+        "rating": await FeedbackCrud.average_rating_by_course_id(course.id),
+        "rating_count": await FeedbackCrud.count_by_course_id(course.id),
     }
 
 
@@ -99,11 +102,13 @@ async def read_course_chapters_by_id(limit: int = 10, offset: int = 0, course: C
 
 @course_router.post("/{id}/chapter", response_model=Detail, tags=["Expert", "Course", "Chapter"])
 async def create_course_chapter_by_id(data: ChapterCreate, course: Course = Depends(require_author(CourseCrud))):
-    return {"detail": await ChapterCrud.create({
-        **data.dict(),
-        "course_id": course.id,
-        "author_id": course.author_id
-    })}
+    return {
+        "detail": await ChapterCrud.create({
+            **data.dict(),
+            "course_id": course.id,
+            "author_id": course.author_id
+        })
+    }
 
 
 @course_router.get("/{id}/learner", response_model=list[User], tags=["Course"])
@@ -122,8 +127,12 @@ async def delete_course_by_id(course: Course = Depends(require_author(CourseCrud
 
 
 @course_router.post("/{id}/enroll", response_model=Detail, tags=["Course"])
-async def enroll_course_by_id(id: str, user: User = Depends(get_current_user)):
-    return {"detail": await UserCourseCrud.create({
-        "user_id": user.id,
-        "course_id": id
-    })}
+async def enroll_course_by_id(course: Course = Depends(require_existed(CourseCrud)), user: User = Depends(get_current_user)):
+    if await UserCourseCrud.exist_by_user_id_and_course_id(user.id, course.id):
+        raise ConflictException()
+    return {
+        "detail": await UserCourseCrud.create({
+            "user_id": user.id,
+            "course_id": course.id
+        })
+    }
