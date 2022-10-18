@@ -7,7 +7,7 @@ from ..database.feedback import FeedbackCrud
 from ..database.lesson import LessonCrud
 from ..database.upload import UploadCrud
 from ..database.user import UserRole
-from ..database.user_course import UserCourseCrud
+from ..database.enrollment import EnrollmentCrud
 from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import (get_current_user, require_author,
                                require_existed, require_roles)
@@ -45,7 +45,7 @@ async def read_created_courses(
 
 @course_router.get("/enrolled", response_model=list[Course], tags=["Course"])
 async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int = 0, user: User = Depends(get_current_user)):
-    return await UserCourseCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
+    return await EnrollmentCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
 
 
 @course_router.post("", response_model=Detail, tags=["Expert", "Course"])
@@ -88,7 +88,7 @@ async def update_course_image_by_id(file: UploadFile = Depends(validate_image), 
 async def read_course_overview_by_id(course: Course = Depends(require_existed(CourseCrud))):
     return {
         "chapters_count": await ChapterCrud.count_by_course_id(course.id),
-        "learners_count": await UserCourseCrud.count_by_course_id(course.id),
+        "learners_count": await EnrollmentCrud.count_by_course_id(course.id),
         "duration": await LessonCrud.sum_duration_by_course_id(course.id),
         "rating": await FeedbackCrud.average_rating_by_course_id(course.id),
         "rating_count": await FeedbackCrud.count_by_course_id(course.id),
@@ -113,7 +113,7 @@ async def create_course_chapter_by_id(data: ChapterCreate, course: Course = Depe
 
 @course_router.get("/{id}/learner", response_model=list[User], tags=["Course"])
 async def read_course_learners_by_id(search: str = "", limit: int = 10, offset: int = 0, course: Course = Depends(require_existed(CourseCrud))):
-    return await UserCourseCrud.find_all_users_by_course_id(course.id, search, limit, offset)
+    return await EnrollmentCrud.find_all_users_by_course_id(course.id, search, limit, offset)
 
 
 @course_router.put("/{id}", response_model=Detail, tags=["Expert", "Course"])
@@ -128,10 +128,10 @@ async def delete_course_by_id(course: Course = Depends(require_author(CourseCrud
 
 @course_router.post("/{id}/enroll", response_model=Detail, tags=["Course"])
 async def enroll_course_by_id(course: Course = Depends(require_existed(CourseCrud)), user: User = Depends(get_current_user)):
-    if await UserCourseCrud.exist_by_user_id_and_course_id(user.id, course.id):
+    if await EnrollmentCrud.exist_by_user_id_and_course_id(user.id, course.id):
         raise ConflictException()
     return {
-        "detail": await UserCourseCrud.create({
+        "detail": await EnrollmentCrud.create({
             "user_id": user.id,
             "course_id": course.id
         })

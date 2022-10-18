@@ -1,7 +1,6 @@
 from pydantic import BaseModel, validator
 
 from .base import CommonAttrs
-from .lesson import Lesson
 
 
 class QuestionCreate(BaseModel):
@@ -30,13 +29,3 @@ class Question(CommonAttrs):
     content: str
     answers : list[Answer]
     has_more_than_one_correct_answer: bool
-
-
-class QuestionAnswerCreate(BaseModel):
-    answer_ids: list[str]
-
-
-class QuestionAnswer(BaseModel):
-    is_correct: bool
-    correct_answer_ids: list[str]
-    wrong_answer_ids: list[str]

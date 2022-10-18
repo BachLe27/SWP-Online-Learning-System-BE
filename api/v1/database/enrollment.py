@@ -1,16 +1,15 @@
-from sqlalchemy import Column, DateTime, ForeignKey, String, select
+from sqlalchemy import Column, ForeignKey, String, select
 
 from .base import Base, Crud
 from .course import CourseCrud
 from .user import UserCrud
 
 
-class UserCourseCrud(Crud, Base):
-    __tablename__ = "UserCourses"
+class EnrollmentCrud(Crud, Base):
+    __tablename__ = "Enrollments"
 
     user_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
     course_id = Column(String(36), ForeignKey("Courses.id"), nullable=False)
-    # completion_date = Column(DateTime, nullable=True)
 
     @classmethod
     async def find_by_user_id_and_course_id(cls, user_id: str, course_id: str):

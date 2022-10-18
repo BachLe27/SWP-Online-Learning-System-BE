@@ -1,9 +1,7 @@
-from sqlalchemy import Column, ForeignKey, String, select, Float, Text
+from sqlalchemy import Column, Float, ForeignKey, String, Text, select
 from sqlalchemy.sql.functions import func
 
 from .base import Base, Crud
-from .course import CourseCrud
-from .user import UserCrud
 
 
 class FeedbackCrud(Crud, Base):

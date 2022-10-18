@@ -9,7 +9,7 @@ from ..schema.course import Course
 from ..schema.feedback import Feedback, FeedbackCreate, FeedbackUpdate
 from ..schema.user import User
 
-feedback_router = APIRouter()
+course_feedback_router = APIRouter()
 
 
 async def get_current_user_feedback(course: Course = Depends(require_existed(CourseCrud)), user: User = Depends(get_current_user)):
@@ -18,12 +18,12 @@ async def get_current_user_feedback(course: Course = Depends(require_existed(Cou
     return feedback
 
 
-@feedback_router.get("", response_model=list[Feedback], tags=["Course", "Feedback"])
+@course_feedback_router.get("", response_model=list[Feedback], tags=["Course", "Feedback"])
 async def read_course_feedbacks_by_course_id(limit: int = 10, offset: int = 0, course: Course = Depends(require_existed(CourseCrud))):
     return await FeedbackCrud.find_all_by_course_id(course.id, limit, offset)
 
 
-@feedback_router.post("", response_model=Detail, tags=["Course", "Feedback"])
+@course_feedback_router.post("", response_model=Detail, tags=["Course", "Feedback"])
 async def feedback_course_by_course_id(data: FeedbackCreate, course: Course = Depends(require_existed(CourseCrud)), user: User = Depends(get_current_user)):
     if await FeedbackCrud.exist_by_user_id_and_course_id(user.id, course.id):
         raise ConflictException()
@@ -36,18 +36,18 @@ async def feedback_course_by_course_id(data: FeedbackCreate, course: Course = De
     }
 
 
-@feedback_router.get("/me", response_model=Feedback, tags=["Course", "Feedback"])
-async def read_course_feedback_by_course_id_and_current_user(feedback: Feedback = Depends(get_current_user_feedback)):
+@course_feedback_router.get("/me", response_model=Feedback, tags=["Course", "Feedback"])
+async def read_current_user_course_feedback_by_course_id(feedback: Feedback = Depends(get_current_user_feedback)):
     return feedback
 
 
-@feedback_router.put("/me", response_model=Feedback, tags=["Course", "Feedback"])
-async def update_course_feedback_by_course_id_and_current_user(data: FeedbackUpdate, feedback: Feedback = Depends(get_current_user_feedback)):
+@course_feedback_router.put("/me", response_model=Detail, tags=["Course", "Feedback"])
+async def update_current_user_course_feedback_by_course_id(data: FeedbackUpdate, feedback: Feedback = Depends(get_current_user_feedback)):
     await FeedbackCrud.update_by_id(feedback.id, data.dict(exclude_none=True))
     return {"detail": "Updated"}
 
 
-@feedback_router.put("/me", response_model=Feedback, tags=["Course", "Feedback"])
-async def delete_course_feedback_by_course_id_and_current_user(data: FeedbackUpdate, feedback: Feedback = Depends(get_current_user_feedback)):
+@course_feedback_router.delete("/me", response_model=Detail, tags=["Course", "Feedback"])
+async def delete_current_user_course_feedback_by_course_id(data: FeedbackUpdate, feedback: Feedback = Depends(get_current_user_feedback)):
     await FeedbackCrud.delete_by_id(feedback.id)
     return {"detail": "Deleted"}
