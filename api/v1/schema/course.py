@@ -10,12 +10,11 @@ class CourseCreate(BaseModel):
     level: str
     is_public: bool
     category_id: str
-    image: str | None
 
     @validator("level")
     def validate_level(cls, level):
         if level not in CourseLevel.ALL:
-            raise ValueError(f"Level must be one of {CourseLevel.ALL}")
+            raise ValueError(f"Role must be one of {CourseLevel.ALL}")
         return level
 
 
@@ -25,21 +24,17 @@ class CourseUpdate(BaseModel):
     level: str | None
     is_public: bool | None
     category_id: str | None
-    image: str | None
 
     @validator("level")
     def validate_level(cls, level):
         if level not in CourseLevel.ALL:
-            raise ValueError(f"Level must be one of {CourseLevel.ALL}")
+            raise ValueError(f"Role must be one of {CourseLevel.ALL}")
         return level
 
 
 class CourseOverview(BaseModel):
     chapters_count: int
     learners_count: int
-    duration: int
-    rating: float
-    rating_count: int
 
 
 class Course(CommonAttrs):
@@ -49,4 +44,3 @@ class Course(CommonAttrs):
     is_public: bool
     category_id: str
     author_id: str
-    image: str | None

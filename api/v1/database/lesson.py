@@ -1,8 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, select
-from sqlalchemy.sql.functions import sum
+from sqlalchemy import Column, ForeignKey, String, Text, Integer
 
 from .base import Base, Crud
-from .course import CourseCrud
 
 
 class LessonCrud(Crud, Base):
@@ -16,17 +14,8 @@ class LessonCrud(Crud, Base):
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
-    async def sum_duration_by_course_id(cls, course_id: str):
-        return await cls.fetch_val(select(sum(cls.duration)).where(CourseCrud.id == course_id))
-
-    @classmethod
     async def find_all_by_chapter_id(cls, chapter_id: str, limit: int, offset: int):
-        return await cls.fetch_all(
-            select(cls)
-                .where(cls.chapter_id == chapter_id)
-                .order_by(cls.created_at)
-                .limit(limit).offset(offset)
-        )
+        return await cls.find_all_by_attr(cls.chapter_id, chapter_id, limit, offset)
 
     @classmethod
     async def count_by_chapter_id(cls, chapter_id: str):

@@ -1,18 +1,14 @@
-# from sqlalchemy import Column, ForeignKey, String, select
+from sqlalchemy import Column, ForeignKey, String, Text, Integer, Boolean
 
-# from .base import Base, Crud
-
-
-# class QuizDetailCrud(Crud, Base):
-#     __tablename__ = "QuizDetails"
-
-#     quiz_id = Column(String, ForeignKey("Quizzes.id"), primary_key=True)
-#     answer_id = Column(String, ForeignKey("Answers.id"), primary_key=True)
+from .base import Base, Crud
 
 
-# class QuizCrud(Crud, Base):
-#     __tablename__ = "Quizzes"
+class QuizCrud(Crud, Base):
+    __tablename__ = "Quizs"
 
-#     user_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
-#     lesson_id = Column(String(36), ForeignKey("Lessons.id"), nullable=False)
-
+    title = Column(String(256), nullable=False)
+    duration = Column(Integer, nullable=False)
+    description = Column(Text, nullable=False)
+    is_public = Column(Boolean, nullable=False)
+    lesson_id = Column(String(36), ForeignKey("Lessons.id"), nullable=False)
+    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
