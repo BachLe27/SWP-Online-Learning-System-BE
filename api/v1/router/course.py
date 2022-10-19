@@ -62,26 +62,26 @@ async def read_course_by_id(course: Course = Depends(require_existed(CourseCrud)
     return course
 
 
-@course_router.get("/{id}/image", tags=["Course"])
-async def read_course_image_by_id(course: Course = Depends(require_existed(CourseCrud))):
-    if course.image is None:
-        raise NotFoundException()
-    upload = await UploadCrud.find_by_id(course.image)
-    return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
+# @course_router.get("/{id}/image", tags=["Course"])
+# async def read_course_image_by_id(course: Course = Depends(require_existed(CourseCrud))):
+#     if course.image is None:
+#         raise NotFoundException()
+#     upload = await UploadCrud.find_by_id(course.image)
+#     return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
 
 
-@course_router.put("/{id}/image", response_model=Detail, tags=["Expert", "Course"])
-async def update_course_image_by_id(file: UploadFile = Depends(validate_image), course: Course = Depends(require_author(CourseCrud))):
-    id = await UploadCrud.create({
-        "file_path": "{id}",
-        "content_type": file.content_type,
-        "author_id": course.author_id,
-    })
-    if not await upload_file(file, f"{id}"):
-        await UploadCrud.delete_by_id(id)
-        raise HTTPException(status_code=500, detail="Upload failed")
-    await CourseCrud.update_by_id(course.id, {"image": id})
-    return {"detail": "Updated"}
+# @course_router.put("/{id}/image", response_model=Detail, tags=["Expert", "Course"])
+# async def update_course_image_by_id(file: UploadFile = Depends(validate_image), course: Course = Depends(require_author(CourseCrud))):
+#     id = await UploadCrud.create({
+#         "file_path": "{id}",
+#         "content_type": file.content_type,
+#         "author_id": course.author_id,
+#     })
+#     if not await upload_file(file, id):
+#         await UploadCrud.delete_by_id(id)
+#         raise HTTPException(status_code=500, detail="Upload failed")
+#     await CourseCrud.update_by_id(course.id, {"image": id})
+#     return {"detail": "Updated"}
 
 
 @course_router.get("/{id}/overview", response_model=CourseOverview, tags=["Course"])

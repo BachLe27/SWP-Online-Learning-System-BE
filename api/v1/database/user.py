@@ -27,7 +27,8 @@ class UserCrud(Crud, Base):
     address = Column(Text, nullable=False)
     bio = Column(Text, nullable=False)
     role = Column(String(256), nullable=False)
-    avatar = Column(String(36), ForeignKey("Uploads.id"))
+    # avatar = Column(String(36), ForeignKey("Uploads.id"))
+    avatar = Column(Text)
 
     @classmethod
     async def create(cls, attrs: dict) -> str:

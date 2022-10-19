@@ -16,6 +16,7 @@ class UserCreate(BaseModel):
     phone: str
     address: str
     bio: str
+    avatar: str | None
 
 
 class UserUpdate(BaseModel):
@@ -25,6 +26,7 @@ class UserUpdate(BaseModel):
     phone: str | None
     address: str | None
     bio: str | None
+    avatar: str | None
 
 
 class UserChangePassword(BaseModel):
@@ -52,3 +54,4 @@ class User(CommonAttrs):
     address: str
     bio: str
     role: str
+    avatar: str | None

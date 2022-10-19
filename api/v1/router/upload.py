@@ -18,7 +18,7 @@ async def upload(file: UploadFile, user: User = Depends(get_current_user)):
         "content_type": file.content_type,
         "author_id": user.id,
     })
-    if not await upload_file(file, f"{id}"):
+    if not await upload_file(file, id):
         await UploadCrud.delete_by_id(id)
         raise HTTPException(status_code=500, detail="Upload failed")
     return {"detail": id}

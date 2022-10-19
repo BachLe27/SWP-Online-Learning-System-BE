@@ -10,6 +10,7 @@ class CourseCreate(BaseModel):
     level: str
     is_public: bool
     category_id: str
+    image: str | None
 
     @validator("level")
     def validate_level(cls, level):
@@ -24,6 +25,7 @@ class CourseUpdate(BaseModel):
     level: str | None
     is_public: bool | None
     category_id: str | None
+    image: str | None
 
     @validator("level")
     def validate_level(cls, level):
@@ -47,3 +49,4 @@ class Course(CommonAttrs):
     is_public: bool
     category_id: str
     author_id: str
+    image: str | None
