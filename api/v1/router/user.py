@@ -40,12 +40,12 @@ async def read_profile(user: User = Depends(get_current_user)):
     return user
 
 
-# @user_router.get("/me/avatar", tags=["Profile"])
-# async def read_avatar(user: User = Depends(get_current_user)):
-#     if user.avatar is None:
-#         raise NotFoundException()
-#     upload = await UploadCrud.find_by_id(user.avatar)
-#     return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
+@user_router.get("/me/avatar", tags=["Profile"])
+async def read_avatar(user: User = Depends(get_current_user)):
+    if user.avatar is None:
+        raise NotFoundException()
+    upload = await UploadCrud.find_by_id(user.avatar)
+    return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
 
 
 @user_router.get("/{id}", response_model=User, tags=["Profile"])
@@ -53,12 +53,12 @@ async def read_profile_by_id(user: User = Depends(require_existed(UserCrud))):
     return user
 
 
-# @user_router.get("/{id}/avatar", tags=["Profile"])
-# async def read_avatar_by_id(user: User = Depends(require_existed(UserCrud))):
-#     if user.avatar is None:
-#         raise NotFoundException()
-#     upload = await UploadCrud.find_by_id(user.avatar)
-#     return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
+@user_router.get("/{id}/avatar", tags=["Profile"])
+async def read_avatar_by_id(user: User = Depends(require_existed(UserCrud))):
+    if user.avatar is None:
+        raise NotFoundException()
+    upload = await UploadCrud.find_by_id(user.avatar)
+    return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)
 
 
 @user_router.post("", response_model=Detail, tags=["Profile", "Auth"])
@@ -78,18 +78,18 @@ async def update_profile(data: UserUpdate, user: User = Depends(get_current_user
     return {"detail": "Updated"}
 
 
-# @user_router.put("/me/avatar", response_model=Detail, tags=["Profile"])
-# async def update_avatar(file: UploadFile = Depends(validate_image), user: User = Depends(get_current_user)):
-#     id = await UploadCrud.create({
-#         "file_path": "{id}",
-#         "content_type": file.content_type,
-#         "author_id": user.id,
-#     })
-#     if not await upload_file(file, id):
-#         await UploadCrud.delete_by_id(id)
-#         raise HTTPException(status_code=500, detail="Upload failed")
-#     await UserCrud.update_by_id(user.id, {"avatar": id})
-#     return {"detail": "Updated"}
+@user_router.put("/me/avatar", response_model=Detail, tags=["Profile"])
+async def update_avatar(file: UploadFile = Depends(validate_image), user: User = Depends(get_current_user)):
+    id = await UploadCrud.create({
+        "file_path": "{id}",
+        "content_type": file.content_type,
+        "author_id": user.id,
+    })
+    if not await upload_file(file, f"{id}"):
+        await UploadCrud.delete_by_id(id)
+        raise HTTPException(status_code=500, detail="Upload failed")
+    await UserCrud.update_by_id(user.id, {"avatar": id})
+    return {"detail": "Updated"}
 
 
 @user_router.put("/me/password", response_model=Detail, tags=["Profile", "Auth"])

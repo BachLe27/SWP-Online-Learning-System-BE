@@ -1,15 +1,23 @@
+from datetime import date
+from subprocess import TimeoutExpired
 from pydantic import BaseModel
 
 from .base import CommonAttrs
 
 
 class PricePackageCreate(BaseModel):
-    pass
-
+    price = float
+    duration = int
+    description = str
+    
 
 class PricePackageUpdate(BaseModel):
-    pass
+    price = float
+    duration = int
+    description = str
 
 
 class PricePackage(CommonAttrs):
-    pass
+    price = float
+    duration = int
+    description = str
