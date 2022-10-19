@@ -15,12 +15,12 @@ async def read_chapter_by_id(chapter: Chapter = Depends(require_existed(ChapterC
     return chapter
 
 
-@chapter_router.put("/{id}", response_model=Chapter, tags=["Admin", "Expert", "Chapter"])
+@chapter_router.put("/{id}", response_model=Chapter, tags=["Expert", "Chapter"])
 async def update_chapter_by_id(data: ChapterUpdate, chapter: Chapter = Depends(require_author(ChapterCrud))):
     return await ChapterCrud.update_by_id(chapter.id, data.dict(exclude_none=True))
 
 
-@chapter_router.delete("/{id}", response_model=Detail, tags=["Admin", "Expert", "Chapter"])
+@chapter_router.delete("/{id}", response_model=Detail, tags=["Expert", "Chapter"])
 async def delete_chapter_by_id(chapter: Chapter = Depends(require_author(ChapterCrud))):
     await ChapterCrud.delete_by_id(chapter.id)
     return {"detail": "Deleted"}
@@ -31,7 +31,7 @@ async def read_chapter_lessons_by_id(limit: int = 10, offset: int = 0, chapter: 
     return await LessonCrud.find_all_by_chapter_id(chapter.id, limit, offset)
 
 
-@chapter_router.post("/{id}/lesson", response_model=Detail, tags=["Admin", "Expert", "Chapter", "Lesson"])
+@chapter_router.post("/{id}/lesson", response_model=Detail, tags=["Expert", "Chapter", "Lesson"])
 async def create_chapter_lesson_by_id(data: LessonCreate, chapter: Chapter = Depends(require_author(ChapterCrud))):
     return {"detail": await LessonCrud.create({
         **data.dict(),
