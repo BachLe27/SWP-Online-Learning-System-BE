@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, select
-from sqlalchemy.sql.functions import sum
+from sqlalchemy.sql.functions import func
 
 from .base import Base, Crud
 from .course import CourseCrud
@@ -17,7 +17,10 @@ class LessonCrud(Crud, Base):
 
     @classmethod
     async def sum_duration_by_course_id(cls, course_id: str):
-        return await cls.fetch_val(select(sum(cls.duration)).where(CourseCrud.id == course_id))
+        return await cls.fetch_val(
+            select(func.sum(cls.duration))
+                .where(CourseCrud.id == course_id)
+        ) or 0
 
     @classmethod
     async def find_all_by_chapter_id(cls, chapter_id: str, limit: int, offset: int):

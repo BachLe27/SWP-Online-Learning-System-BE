@@ -15,9 +15,10 @@ async def read_chapter_by_id(chapter: Chapter = Depends(require_existed(ChapterC
     return chapter
 
 
-@chapter_router.put("/{id}", response_model=Chapter, tags=["Expert", "Chapter"])
+@chapter_router.put("/{id}", response_model=Detail, tags=["Expert", "Chapter"])
 async def update_chapter_by_id(data: ChapterUpdate, chapter: Chapter = Depends(require_author(ChapterCrud))):
-    return await ChapterCrud.update_by_id(chapter.id, data.dict(exclude_none=True))
+    await ChapterCrud.update_by_id(chapter.id, data.dict(exclude_none=True))
+    return {"detail": "Updated"}
 
 
 @chapter_router.delete("/{id}", response_model=Detail, tags=["Expert", "Chapter"])

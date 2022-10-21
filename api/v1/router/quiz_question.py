@@ -9,38 +9,38 @@ from ..schema.lesson import Lesson
 from ..schema.question import Question, QuestionCreate
 from ..schema.user import User
 
-lesson_question_router = APIRouter()
+quiz_question_router = APIRouter()
 
 
-@lesson_question_router.get("", response_model=list[Question], tags=["Lesson", "Question"])
-async def read_questions_by_lesson_id(lesson: Lesson = Depends(require_existed(LessonCrud))):
-    return [
-        {
-            **question,
-            "answers": await AnswerCrud.find_all_by_question_id_no_limit(question.id),
-            "has_more_than_one_correct_answer": await AnswerCrud.count_correct_by_question_id(question.id) > 1
-        }
-        for question in await QuestionCrud.find_all_by_lesson_id_no_limit(lesson.id)
-    ]
+# @quiz_question_router.get("", response_model=list[Question], tags=["Lesson", "Question"])
+# async def read_questions_by_lesson_id(lesson: Lesson = Depends(require_existed(LessonCrud))):
+#     return [
+#         {
+#             **question,
+#             "answers": await AnswerCrud.find_all_by_question_id_no_limit(question.id),
+#             "has_more_than_one_correct_answer": await AnswerCrud.count_correct_by_question_id(question.id) > 1
+#         }
+#         for question in await QuestionCrud.find_all_by_lesson_id_no_limit(lesson.id)
+#     ]
 
 
-@lesson_question_router.post("", response_model=Detail, tags=["Expert", "Lesson", "Question"])
-async def create_question_by_lesson_id(data: QuestionCreate, lesson: Lesson = Depends(require_author(LessonCrud))):
-    question_id = await QuestionCrud.create({
-        "content": data.content,
-        "lesson_id": lesson.id,
-        "author_id": lesson.author_id,
-    })
-    for answer in data.answers:
-        await AnswerCrud.create({
-            "content": answer.content,
-            "is_correct": answer.is_correct,
-            "question_id": question_id,
-        })
-    return {"detail": question_id}
+# @quiz_question_router.post("", response_model=Detail, tags=["Expert", "Lesson", "Question"])
+# async def create_question_by_lesson_id(data: QuestionCreate, lesson: Lesson = Depends(require_author(LessonCrud))):
+#     question_id = await QuestionCrud.create({
+#         "content": data.content,
+#         "lesson_id": lesson.id,
+#         "author_id": lesson.author_id,
+#     })
+#     for answer in data.answers:
+#         await AnswerCrud.create({
+#             "content": answer.content,
+#             "is_correct": answer.is_correct,
+#             "question_id": question_id,
+#         })
+#     return {"detail": question_id}
 
 
-# @lesson_question_router.get("/quiz", response_model=QuizAnswerResult, tags=["Lesson", "Question"])
+# @quiz_question_router.get("/quiz", response_model=QuizAnswerResult, tags=["Lesson", "Question"])
 # async def get_quiz_result_by_lesson_id(data: list[QuizAnswerCreate], user: User = Depends(get_current_user)):
 #     answers = {
 #         await AnswerCrud.find_by_id(item.answer_id)
@@ -55,7 +55,7 @@ async def create_question_by_lesson_id(data: QuestionCreate, lesson: Lesson = De
 #     }
 
 
-# @lesson_question_router.post("/quiz", response_model=QuizAnswerResult, tags=["Lesson", "Question"])
+# @quiz_question_router.post("/quiz", response_model=QuizAnswerResult, tags=["Lesson", "Question"])
 # async def take_quiz_by_lesson_id(data: QuizAnswerCreate, question = Depends(require_existed(QuestionCrud)), user: User = Depends(get_current_user)):
 #     # validate answers
 #     answers = [ await AnswerCrud.find_by_id(id) for id in data.answer_ids ]

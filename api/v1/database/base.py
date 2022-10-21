@@ -6,7 +6,7 @@ from databases import Database
 from sqlalchemy import Column, DateTime, String, delete, insert, select, update
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql.functions import count
+from sqlalchemy.sql.functions import func
 
 DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:///database.db")
 
@@ -72,7 +72,7 @@ class Crud:
 
     @classmethod
     async def count_by_attr(cls, attr, value):
-        return await cls.fetch_val(select(count(cls.id)).where(attr == value))
+        return await cls.fetch_val(select(func.count(cls.id)).where(attr == value))
 
     @classmethod
     async def exist_by_id(cls, id: str):

@@ -14,7 +14,7 @@ class FeedbackCrud(Crud, Base):
 
     @classmethod
     async def find_by_user_id_and_course_id(cls, user_id: str, course_id: str):
-        return cls.fetch_one(
+        return await cls.fetch_one(
             select(cls)
                 .where((cls.user_id == user_id) & (cls.course_id == course_id))
         )
@@ -40,4 +40,4 @@ class FeedbackCrud(Crud, Base):
         return await cls.fetch_val(
             select(func.avg(cls.rating))
                 .where(cls.course_id == course_id)
-        )
+        ) or 0

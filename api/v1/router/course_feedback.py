@@ -48,6 +48,6 @@ async def update_current_user_course_feedback_by_course_id(data: FeedbackUpdate,
 
 
 @course_feedback_router.delete("/me", response_model=Detail, tags=["Course", "Feedback"])
-async def delete_current_user_course_feedback_by_course_id(data: FeedbackUpdate, feedback: Feedback = Depends(get_current_user_feedback)):
+async def delete_current_user_course_feedback_by_course_id(feedback: Feedback = Depends(get_current_user_feedback)):
     await FeedbackCrud.delete_by_id(feedback.id)
     return {"detail": "Deleted"}

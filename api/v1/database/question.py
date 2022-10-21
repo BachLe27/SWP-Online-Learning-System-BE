@@ -7,7 +7,7 @@ class QuestionCrud(Crud, Base):
     __tablename__ = "Questions"
 
     content = Column(Text, nullable=False)
-    lesson_id = Column(String(36), ForeignKey("Lessons.id"), nullable=False)
+    quiz_id = Column(String(36), ForeignKey("Quizzes.id"), nullable=False)
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
