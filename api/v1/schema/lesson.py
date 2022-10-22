@@ -23,3 +23,4 @@ class Lesson(CommonAttrs):
     description: str
     content: str
     chapter_id: str
+    has_quiz: bool

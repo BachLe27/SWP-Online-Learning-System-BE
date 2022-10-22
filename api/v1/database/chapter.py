@@ -8,7 +8,7 @@ class ChapterCrud(Crud, Base):
 
     title = Column(String(256), nullable=False)
     description = Column(Text, nullable=False)
-    course_id = Column(String(36), ForeignKey("Courses.id"), nullable=False)
+    course_id = Column(String(36), ForeignKey("Courses.id", ondelete="CASCADE"), nullable=False)
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
@@ -16,7 +16,6 @@ class ChapterCrud(Crud, Base):
         return await cls.fetch_all(
             select(cls)
                 .where(cls.course_id == course_id)
-                .order_by(cls.created_at)
                 .limit(limit).offset(offset)
         )
 

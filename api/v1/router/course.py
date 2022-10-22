@@ -38,7 +38,7 @@ async def read_created_courses(
         offset: int = 0,
         user: User = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))
     ):
-    return await CourseCrud.find_all_by_author_id(search, levels, limit, offset, user.id)
+    return await CourseCrud.find_all_by_author_id(user.id, search, levels, limit, offset)
 
 
 @course_router.get("/enrolled", response_model=list[Course], tags=["Course"])

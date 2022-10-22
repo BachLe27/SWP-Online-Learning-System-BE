@@ -56,10 +56,22 @@ class FeedbackCreate(BaseModel):
     rating: float
     comment: str
 
+    @validator("rating")
+    def rating_must_be_between_0_and_5(cls, rating):
+        if not 0 <= rating <= 5:
+            raise ValueError("Rating must be between 0 and 5")
+        return rating
+
 
 class FeedbackUpdate(BaseModel):
     rating: float | None
     comment: str | None
+
+    @validator("rating")
+    def rating_must_be_between_0_and_5(cls, rating):
+        if rating is not None and not 0 <= rating <= 5:
+            raise ValueError("Rating must be between 0 and 5")
+        return rating
 
 
 class Feedback(CommonAttrs):

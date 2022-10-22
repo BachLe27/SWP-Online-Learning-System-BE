@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from ..database.chapter import ChapterCrud
 from ..database.lesson import LessonCrud
+from ..database.quiz import QuizCrud
 from ..middleware.auth import require_author, require_existed
 from ..schema.base import Detail
 from ..schema.chapter import Chapter, ChapterUpdate
@@ -29,13 +30,21 @@ async def delete_chapter_by_id(chapter: Chapter = Depends(require_author(Chapter
 
 @chapter_router.get("/{id}/lesson", response_model=list[Lesson], tags=["Chapter", "Lesson"])
 async def read_chapter_lessons_by_id(limit: int = 10, offset: int = 0, chapter: Chapter = Depends(require_existed(ChapterCrud))):
-    return await LessonCrud.find_all_by_chapter_id(chapter.id, limit, offset)
+    return [
+        {
+            **lesson,
+            "has_quiz": await QuizCrud.exist_by_lesson_id(lesson.id)
+        }
+        for lesson in await LessonCrud.find_all_by_chapter_id(chapter.id, limit, offset)
+    ]
 
 
 @chapter_router.post("/{id}/lesson", response_model=Detail, tags=["Expert", "Chapter", "Lesson"])
 async def create_chapter_lesson_by_id(data: LessonCreate, chapter: Chapter = Depends(require_author(ChapterCrud))):
-    return {"detail": await LessonCrud.create({
-        **data.dict(),
-        "chapter_id": chapter.id,
-        "author_id": chapter.author_id
-    })}
+    return {
+        "detail": await LessonCrud.create({
+            **data.dict(),
+            "chapter_id": chapter.id,
+            "author_id": chapter.author_id
+        })
+    }

@@ -21,8 +21,8 @@ class CourseCrud(Crud, Base):
     # image = Column(String(36), ForeignKey("Uploads.id"))
     image = Column(Text)
     is_public = Column(Boolean, nullable=False)
-    category_id = Column(String(36), ForeignKey("Categories.id"), nullable=False)
-    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
+    category_id = Column(String(36), ForeignKey("Categories.id", ondelete="CASCADE"), nullable=False)
+    author_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
     async def find_all(cls, search: str, levels: list[str], limit: int, offset: int):
@@ -33,7 +33,7 @@ class CourseCrud(Crud, Base):
         )
 
     @classmethod
-    async def find_all_by_author_id(cls, search: str, levels: list[str], limit: int, offset: int, author_id: str):
+    async def find_all_by_author_id(cls, author_id: str, search: str, levels: list[str], limit: int, offset: int):
         return await cls.fetch_all(
             select(cls)
                 .where((cls.author_id == author_id) & (cls.title.contains(search)) & (cls.level.in_(levels)))
@@ -44,8 +44,8 @@ class CourseCrud(Crud, Base):
 class EnrollmentCrud(Crud, Base):
     __tablename__ = "Enrollments"
 
-    user_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
-    course_id = Column(String(36), ForeignKey("Courses.id"), nullable=False)
+    user_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
+    course_id = Column(String(36), ForeignKey("Courses.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
     async def find_by_user_id_and_course_id(cls, user_id: str, course_id: str):
@@ -61,7 +61,7 @@ class EnrollmentCrud(Crud, Base):
     @classmethod
     async def find_all_courses_by_user_id(cls, user_id: str, search: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(CourseCrud)
+            select(cls, CourseCrud)
                 .where((cls.user_id == user_id) & (CourseCrud.title.contains(search)))
                 .limit(limit).offset(offset)
         )
@@ -69,7 +69,7 @@ class EnrollmentCrud(Crud, Base):
     @classmethod
     async def find_all_users_by_course_id(cls, course_id: str, search:str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(UserCrud)
+            select(cls, UserCrud)
                 .where((cls.course_id == course_id) & (UserCrud.full_name.contains(search)))
                 .limit(limit).offset(offset)
         )
@@ -84,8 +84,8 @@ class FeedbackCrud(Crud, Base):
 
     rating = Column(Float, nullable=False)
     comment = Column(Text, nullable=False)
-    user_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
-    course_id = Column(String(36), ForeignKey("Courses.id"), nullable=False)
+    user_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
+    course_id = Column(String(36), ForeignKey("Courses.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
     async def find_by_user_id_and_course_id(cls, user_id: str, course_id: str):

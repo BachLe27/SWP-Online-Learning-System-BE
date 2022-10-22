@@ -67,7 +67,7 @@ class UserCrud(Crud, Base):
         return await cls.find_by_email(email) is not None
 
     @classmethod
-    async def find_all(cls, search:str, roles:list[str], limit: int, offset: int):
+    async def find_all(cls, search: str, roles: list[str], limit: int, offset: int):
         return await cls.fetch_all(
             select(cls)
                 .where((cls.full_name.contains(search)) & (cls.role.in_(roles)))

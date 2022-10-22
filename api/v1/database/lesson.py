@@ -12,7 +12,7 @@ class LessonCrud(Crud, Base):
     duration = Column(Integer, nullable=False)
     description = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
-    chapter_id = Column(String(36), ForeignKey("Chapters.id"), nullable=False)
+    chapter_id = Column(String(36), ForeignKey("Chapters.id", ondelete="CASCADE"), nullable=False)
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
@@ -27,7 +27,6 @@ class LessonCrud(Crud, Base):
         return await cls.fetch_all(
             select(cls)
                 .where(cls.chapter_id == chapter_id)
-                .order_by(cls.created_at)
                 .limit(limit).offset(offset)
         )
 

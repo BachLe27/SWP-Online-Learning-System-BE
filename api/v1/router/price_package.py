@@ -1,7 +1,6 @@
 from datetime import date
-from fastapi import APIRouter, Depends
 
-from api.v1.schema.user import User
+from fastapi import APIRouter, Depends
 
 from ..database.price_package import PricePackageCrud, PurchaseCrud
 from ..database.user import UserRole
@@ -9,6 +8,7 @@ from ..middleware.auth import get_current_user, require_existed, require_roles
 from ..schema.base import Detail
 from ..schema.price_package import (PricePackage, PricePackageCreate,
                                     PricePackageUpdate)
+from ..schema.user import User
 
 auth_middleware = {
     "dependencies": [Depends(require_roles(UserRole.ADMIN, UserRole.STAFF))],

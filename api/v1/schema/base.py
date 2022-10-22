@@ -13,6 +13,10 @@ class Detail(BaseModel):
     detail: str
 
 
+class IDs(BaseModel):
+    ids: list[str]
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str

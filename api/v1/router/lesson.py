@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from ..database.lesson import LessonCrud
+from ..database.quiz import QuizCrud
 from ..middleware.auth import require_author, require_existed
 from ..schema.base import Detail
 from ..schema.lesson import Lesson, LessonUpdate
@@ -10,7 +11,10 @@ lesson_router = APIRouter()
 
 @lesson_router.get("/{id}", response_model=Lesson, tags=["Lesson"])
 async def read_lesson_by_id(lesson: Lesson = Depends(require_existed(LessonCrud))):
-    return lesson
+    return {
+        **lesson,
+        "has_quiz": await QuizCrud.exist_by_lesson_id(lesson.id)
+    }
 
 
 @lesson_router.put("/{id}", response_model=Detail, tags=["Expert", "Lesson"])
