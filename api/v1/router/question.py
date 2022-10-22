@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from ..database.question import QuestionCrud
+from ..database.quiz import QuestionCrud
 from ..middleware.auth import require_author
 from ..schema.base import Detail
 

@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends
 
-from ..database.answer import AnswerCrud
+from ..database.quiz import AnswerCrud, QuestionCrud
 from ..database.lesson import LessonCrud
-from ..database.question import QuestionCrud
 from ..middleware.auth import get_current_user, require_author, require_existed
 from ..schema.base import Detail
 from ..schema.lesson import Lesson
-from ..schema.question import Question, QuestionCreate
+from ..schema.quiz import Question, QuestionCreate
 from ..schema.user import User
 
 quiz_question_router = APIRouter()

@@ -11,7 +11,6 @@ from .database import UserCrud, create_tables
 from .router import *
 from .service.user import hash_password
 
-
 app = FastAPI()
 
 
@@ -38,11 +37,12 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/token")
 app.include_router(user_router, prefix="/user")
+app.include_router(price_package_router, prefix="/price_package")
 app.include_router(category_router, prefix="/category")
 app.include_router(course_router, prefix="/course")
 app.include_router(course_feedback_router, prefix="/course/{id}/feedback")
 app.include_router(chapter_router, prefix="/chapter")
 app.include_router(lesson_router, prefix="/lesson")
 # app.include_router(quiz_question_router, prefix="/quiz/{id}/question")
-app.include_router(question_router, prefix="/question")
+# app.include_router(question_router, prefix="/question")
 app.include_router(upload_router, prefix="/upload")

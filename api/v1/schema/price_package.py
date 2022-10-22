@@ -1,15 +1,26 @@
+from datetime import date
+
 from pydantic import BaseModel
 
 from .base import CommonAttrs
 
 
 class PricePackageCreate(BaseModel):
-    pass
+    is_active: bool
+    price: float
+    duration: date
+    description: str
 
 
 class PricePackageUpdate(BaseModel):
-    pass
+    is_active: bool | None
+    price: float | None
+    duration: date | None
+    description: str | None
 
 
 class PricePackage(CommonAttrs):
-    pass
+    is_active: bool
+    price: float
+    duration: date
+    description: str

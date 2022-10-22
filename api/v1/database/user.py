@@ -11,7 +11,7 @@ class UserRole:
     STAFF = "STAFF"
     EXPERT = "EXPERT"
     USER = "USER"
-    ALL = [ADMIN, STAFF, EXPERT, USER]
+    ALL = ( ADMIN, STAFF, EXPERT, USER )
 
 
 class UserCrud(Crud, Base):

@@ -50,3 +50,20 @@ class Course(CommonAttrs):
     category_id: str
     author_id: str
     image: str | None
+
+
+class FeedbackCreate(BaseModel):
+    rating: float
+    comment: str
+
+
+class FeedbackUpdate(BaseModel):
+    rating: float | None
+    comment: str | None
+
+
+class Feedback(CommonAttrs):
+    rating: float
+    comment: str
+    user_id: str
+    course_id: str

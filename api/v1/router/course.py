@@ -2,12 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 
 from ..database.chapter import ChapterCrud
-from ..database.course import CourseCrud
-from ..database.feedback import FeedbackCrud
+from ..database.course import CourseCrud, EnrollmentCrud, FeedbackCrud
 from ..database.lesson import LessonCrud
 from ..database.upload import UploadCrud
 from ..database.user import UserRole
-from ..database.enrollment import EnrollmentCrud
 from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import (get_current_user, require_author,
                                require_existed, require_roles)

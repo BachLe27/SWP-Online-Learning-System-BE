@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Depends
 
-from ..database.course import CourseCrud
-from ..database.feedback import FeedbackCrud
+from ..database.course import CourseCrud, FeedbackCrud
 from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import get_current_user, require_existed
 from ..schema.base import Detail
-from ..schema.course import Course
-from ..schema.feedback import Feedback, FeedbackCreate, FeedbackUpdate
+from ..schema.course import Course, Feedback, FeedbackCreate, FeedbackUpdate
 from ..schema.user import User
 
 course_feedback_router = APIRouter()
