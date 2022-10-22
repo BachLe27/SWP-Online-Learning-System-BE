@@ -3,10 +3,12 @@ from .category import CategoryCrud
 from .chapter import ChapterCrud
 from .course import CourseCrud
 from .enrollment import EnrollmentCrud
+from .feedback import FeedbackCrud
 from .lesson import LessonCrud
 from .price_package import PricePackageCrud
 from .purchase import PurchaseCrud
 from .question import QuestionCrud
+from .quiz import QuizCrud
 from .upload import UploadCrud
 from .user import UserCrud
 
