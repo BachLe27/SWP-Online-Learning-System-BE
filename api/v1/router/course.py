@@ -55,6 +55,7 @@ async def create_course(data: CourseCreate, user: User = Depends(require_roles(U
         })
     }
 
+
 @course_router.get("/{id}", response_model=Course, tags=["Course"])
 async def read_course_by_id(course: Course = Depends(require_existed(CourseCrud))):
     return course

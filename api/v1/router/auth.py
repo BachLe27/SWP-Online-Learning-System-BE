@@ -2,10 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from ..database.user import UserCrud
-from ..middleware.auth import create_access_token
 from ..schema.base import Token
+from ..service.jwt import create_token
 from ..service.user import verify_password
-
 
 auth_router = APIRouter()
 
@@ -16,6 +15,6 @@ async def login(data: OAuth2PasswordRequestForm = Depends()):
     if user is None or not verify_password(data.password, user.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
     return {
-        "access_token": create_access_token({"id": user.id}, "access"),
+        "access_token": create_token({"id": user.id}, "access"),
         "token_type": "bearer",
     }

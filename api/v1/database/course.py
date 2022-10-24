@@ -61,7 +61,8 @@ class EnrollmentCrud(Crud, Base):
     @classmethod
     async def find_all_courses_by_user_id(cls, user_id: str, search: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls, CourseCrud)
+            select(CourseCrud)
+                .join(cls)
                 .where((cls.user_id == user_id) & (CourseCrud.title.contains(search)))
                 .limit(limit).offset(offset)
         )
@@ -69,7 +70,8 @@ class EnrollmentCrud(Crud, Base):
     @classmethod
     async def find_all_users_by_course_id(cls, course_id: str, search:str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls, UserCrud)
+            select(UserCrud)
+                .join(cls)
                 .where((cls.course_id == course_id) & (UserCrud.full_name.contains(search)))
                 .limit(limit).offset(offset)
         )
