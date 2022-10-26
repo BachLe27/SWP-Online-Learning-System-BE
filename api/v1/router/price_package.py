@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends
 
@@ -46,6 +46,6 @@ async def purchase_price_package(price_package: PricePackage = Depends(require_e
         "price_package_id": price_package.id,
         "user_id": user.id,
         "purchase_price": price_package.price,
-        "end_date": date.today() + price_package.duration
+        "end_date": date.today() + timedelta(days=price_package.duration)
     })
     return {"":""}

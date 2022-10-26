@@ -8,19 +8,19 @@ from .base import CommonAttrs
 class PricePackageCreate(BaseModel):
     is_active: bool
     price: float
-    duration: date
+    duration: int
     description: str
 
 
 class PricePackageUpdate(BaseModel):
     is_active: bool | None
     price: float | None
-    duration: date | None
+    duration: int | None
     description: str | None
 
 
 class PricePackage(CommonAttrs):
     is_active: bool
     price: float
-    duration: date
+    duration: int
     description: str

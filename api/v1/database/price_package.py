@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, Date, Float, ForeignKey, String, Text
+from sqlalchemy import (Boolean, Column, Date, Float, ForeignKey, Integer,
+                        String, Text)
 
 from .base import Base, Crud
 
@@ -8,7 +9,7 @@ class PricePackageCrud(Crud, Base):
 
     is_active = Column(Boolean, nullable=False)
     price = Column(Float, nullable=False)
-    duration = Column(Date, nullable=False)
+    duration = Column(Integer, nullable=False)
     description = Column(Text, nullable=False)
 
 
