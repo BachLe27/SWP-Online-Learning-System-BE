@@ -29,19 +29,19 @@ async def create_price_package(data: PricePackageCreate):
 
 
 @price_package_router.put("/{id}", response_model=Detail, **auth_middleware)
-async def update_price_package_by_id(data: PricePackageUpdate, price_package: PricePackage = Depends(require_existed(PricePackageCrud))):
+async def update_price_package_by_id(data: PricePackageUpdate, price_package: PricePackageCrud = Depends(require_existed(PricePackageCrud))):
     await PricePackageCrud.update_by_id(price_package.id, data.dict(exclude_none=True))
     return {"detail": "Updated"}
 
 
 @price_package_router.delete("/{id}", response_model=Detail, **auth_middleware)
-async def delete_price_package_by_id(price_package: PricePackage = Depends(require_existed(PricePackageCrud))):
+async def delete_price_package_by_id(price_package: PricePackageCrud = Depends(require_existed(PricePackageCrud))):
     await PricePackageCrud.delete_by_id(price_package.id)
     return {"detail": "Deleted"}
 
 
 @price_package_router.post("/{id}/purchase", tags=["PricePackage"])
-async def purchase_price_package(price_package: PricePackage = Depends(require_existed(PricePackageCrud)), user: User = Depends(get_current_user)):
+async def purchase_price_package(price_package: PricePackageCrud = Depends(require_existed(PricePackageCrud)), user: User = Depends(get_current_user)):
     await PurchaseCrud.create({
         "price_package_id": price_package.id,
         "user_id": user.id,

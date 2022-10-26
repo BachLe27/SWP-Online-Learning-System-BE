@@ -5,7 +5,6 @@ from ..database.base import Crud
 from ..database.user import UserCrud
 from ..exception.http import (CredentialException, ForbiddenException,
                               NotFoundException)
-from ..schema.user import User
 from ..service.jwt import JWTError, decode_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -40,7 +39,7 @@ def require_existed(crud: Crud):
 
 
 def require_author(crud: Crud):
-    async def func(obj = Depends(crud.find_by_id), user: User = Depends(get_current_user)):
+    async def func(obj = Depends(crud.find_by_id), user: UserCrud = Depends(get_current_user)):
         if obj is None:
             raise NotFoundException()
         if obj.author_id != user.id:
@@ -50,7 +49,7 @@ def require_author(crud: Crud):
 
 
 def require_roles(*roles):
-    async def func(user: User = Depends(get_current_user)):
+    async def func(user: UserCrud = Depends(get_current_user)):
         if user.role not in roles:
             raise ForbiddenException()
         return user
@@ -58,7 +57,7 @@ def require_roles(*roles):
 
 
 def exclude_roles(*roles):
-    async def func(user: User = Depends(get_current_user)):
+    async def func(user: UserCrud = Depends(get_current_user)):
         if user.role in roles:
             raise ForbiddenException()
         return user

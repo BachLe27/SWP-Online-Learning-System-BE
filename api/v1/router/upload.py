@@ -1,18 +1,18 @@
-from fastapi import APIRouter, Depends, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, UploadFile
 from fastapi.responses import StreamingResponse
 
 from ..database.upload import UploadCrud
+from ..database.user import UserCrud
+from ..exception.http import InternalServerErrorException
 from ..middleware.auth import get_current_user, require_existed
 from ..schema.base import Detail
-from ..schema.user import User
-from ..service.storage import upload_file, download_file
-
+from ..service.storage import download_file, upload_file
 
 upload_router = APIRouter()
 
 
 @upload_router.post("", response_model=Detail, tags=["Upload"])
-async def upload(file: UploadFile, user: User = Depends(get_current_user)):
+async def upload(file: UploadFile, user: UserCrud = Depends(get_current_user)):
     id = await UploadCrud.create({
         "file_path": "{id}",
         "content_type": file.content_type,
@@ -20,10 +20,10 @@ async def upload(file: UploadFile, user: User = Depends(get_current_user)):
     })
     if not await upload_file(file, id):
         await UploadCrud.delete_by_id(id)
-        raise HTTPException(status_code=500, detail="Upload failed")
+        raise InternalServerErrorException("Upload failed")
     return {"detail": id}
 
 
 @upload_router.get("/{id}", tags=["Upload"])
-async def download(upload = Depends(require_existed(UploadCrud))):
+async def download(upload: UploadCrud = Depends(require_existed(UploadCrud))):
     return StreamingResponse(download_file(upload.file_path), media_type=upload.content_type)

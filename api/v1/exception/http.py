@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 
 
 class BadRequestException(HTTPException):
-    def __init__(self, detail: str = "Bad request"):
+    def __init__(self, detail: str = "Bad Request"):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
 
@@ -24,6 +24,11 @@ class ConflictException(HTTPException):
 class ValidationException(HTTPException):
     def __init__(self, detail: str = "Validation Error"):
         super().__init__(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail)
+
+
+class InternalServerErrorException(HTTPException):
+    def __init__(self, detail: str = "Internal Server Error"):
+        super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
 
 class CredentialException(HTTPException):

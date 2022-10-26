@@ -2,6 +2,7 @@ from pydantic import BaseModel, validator
 
 from ..database.course import CourseLevel
 from .base import CommonAttrs
+from .user import User
 
 
 class CourseCreate(BaseModel):
@@ -48,7 +49,7 @@ class Course(CommonAttrs):
     level: str
     is_public: bool
     category_id: str
-    author_id: str
+    author: User
     image: str | None
 
 

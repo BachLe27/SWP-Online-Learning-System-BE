@@ -10,7 +10,7 @@ lesson_router = APIRouter()
 
 
 @lesson_router.get("/{id}", response_model=Lesson, tags=["Lesson"])
-async def read_lesson_by_id(lesson: Lesson = Depends(require_existed(LessonCrud))):
+async def read_lesson_by_id(lesson: LessonCrud = Depends(require_existed(LessonCrud))):
     return {
         **lesson,
         "has_quiz": await QuizCrud.exist_by_lesson_id(lesson.id)
@@ -18,12 +18,12 @@ async def read_lesson_by_id(lesson: Lesson = Depends(require_existed(LessonCrud)
 
 
 @lesson_router.put("/{id}", response_model=Detail, tags=["Expert", "Lesson"])
-async def update_lesson_by_id(data: LessonUpdate, lesson: Lesson = Depends(require_author(LessonCrud))):
+async def update_lesson_by_id(data: LessonUpdate, lesson: LessonCrud = Depends(require_author(LessonCrud))):
     await LessonCrud.update_by_id(lesson.id, data.dict(exclude_none=True))
     return {"detail": "Updated"}
 
 
 @lesson_router.delete("/{id}", response_model=Detail, tags=["Expert", "Lesson"])
-async def delete_lesson_by_id(lesson: Lesson = Depends(require_author(LessonCrud))):
+async def delete_lesson_by_id(lesson: LessonCrud = Depends(require_author(LessonCrud))):
     await LessonCrud.delete_by_id(lesson.id)
     return {"detail": "Deleted"}

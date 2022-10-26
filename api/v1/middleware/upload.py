@@ -1,7 +1,9 @@
-from fastapi import UploadFile, HTTPException
+from fastapi import UploadFile
+
+from ..exception.http import BadRequestException
 
 
 def validate_image(image: UploadFile) -> UploadFile:
     if not image.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File is not image")
+        raise BadRequestException("File is not image")
     return image

@@ -1,20 +1,19 @@
 from fastapi import APIRouter, Depends
 
 from ..database.lesson import LessonCrud
-from ..database.user import UserRole
-from ..database.quiz import AnswerCrud, QuestionCrud, QuizCrud, QuizTakenCrud, QuizTakenDetailCrud
+from ..database.quiz import (AnswerCrud, QuestionCrud, QuizCrud, QuizTakenCrud,
+                             QuizTakenDetailCrud)
+from ..database.user import UserCrud, UserRole
 from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import get_current_user, require_author, require_existed
 from ..schema.base import Detail
-from ..schema.lesson import Lesson
-from ..schema.quiz import (QuestionCreate, Quiz, QuizCreate, QuizResult, QuizSubmit,
-                           QuizUpdate)
-from ..schema.user import User
+from ..schema.quiz import (QuestionCreate, Quiz, QuizCreate, QuizResult,
+                           QuizSubmit, QuizUpdate)
 
 lesson_quiz_router = APIRouter()
 
 
-async def _get_current_lesson_quiz(lesson: Lesson = Depends(require_existed(LessonCrud))):
+async def _get_current_lesson_quiz(lesson: LessonCrud = Depends(require_existed(LessonCrud))):
     if (quiz := await QuizCrud.find_by_lesson_id(lesson.id)) is None:
         NotFoundException()
     return quiz
@@ -42,7 +41,7 @@ async def _get_result_for(id: str):
 
 
 @lesson_quiz_router.get("", response_model=Quiz, tags=["Lesson", "Quiz"])
-async def read_quiz_by_lesson_id(quiz = Depends(_get_current_lesson_quiz), user: User = Depends(get_current_user)):
+async def read_quiz_by_lesson_id(quiz: QuizCrud = Depends(_get_current_lesson_quiz), user: UserCrud = Depends(get_current_user)):
     return {
         **quiz,
         "questions": [
@@ -57,7 +56,7 @@ async def read_quiz_by_lesson_id(quiz = Depends(_get_current_lesson_quiz), user:
 
 
 @lesson_quiz_router.post("", response_model=Detail, tags=["Expert", "Lesson", "Quiz"])
-async def create_quiz_by_lesson_id(data: QuizCreate, lesson: Lesson = Depends(require_author(LessonCrud))):
+async def create_quiz_by_lesson_id(data: QuizCreate, lesson: LessonCrud = Depends(require_author(LessonCrud))):
     if await QuizCrud.exist_by_lesson_id(lesson.id):
         raise ConflictException()
     return {
@@ -70,19 +69,19 @@ async def create_quiz_by_lesson_id(data: QuizCreate, lesson: Lesson = Depends(re
 
 
 @lesson_quiz_router.put("", response_model=Detail, tags=["Expert", "Lesson", "Quiz"])
-async def update_quiz_by_lesson_id(data: QuizUpdate, quiz = Depends(_get_current_lesson_quiz)):
+async def update_quiz_by_lesson_id(data: QuizUpdate, quiz: QuizCrud = Depends(_get_current_lesson_quiz)):
     await QuizCrud.update_by_id(quiz.id, data.dict())
     return {"detail": "Updated"}
 
 
 @lesson_quiz_router.delete("", response_model=Detail, tags=["Expert", "Lesson", "Quiz"])
-async def delete_quiz_by_lesson_id(quiz = Depends(_get_current_lesson_quiz)):
+async def delete_quiz_by_lesson_id(quiz: QuizCrud = Depends(_get_current_lesson_quiz)):
     await QuizCrud.delete_by_id(quiz.id)
     return {"detail": "Deleted"}
 
 
 @lesson_quiz_router.post("/question", response_model=Detail, tags=["Expert", "Lesson", "Quiz"])
-async def create_question_by_lesson_id(data: QuestionCreate, quiz = Depends(_get_current_lesson_quiz)):
+async def create_question_by_lesson_id(data: QuestionCreate, quiz: QuizCrud = Depends(_get_current_lesson_quiz)):
     question_id = await QuestionCrud.create({
         "content": data.content,
         "quiz_id": quiz.id,
@@ -98,7 +97,7 @@ async def create_question_by_lesson_id(data: QuestionCreate, quiz = Depends(_get
 
 
 @lesson_quiz_router.post("/submission", response_model=QuizResult, tags=["Lesson", "Quiz"])
-async def submit_quiz_by_lesson_id(data: QuizSubmit, quiz = Depends(_get_current_lesson_quiz), user: User = Depends(get_current_user)):
+async def submit_quiz_by_lesson_id(data: QuizSubmit, quiz: QuizCrud = Depends(_get_current_lesson_quiz), user: UserCrud = Depends(get_current_user)):
     quiz_taken_id = await QuizTakenCrud.create({
         "quiz_id": quiz.id,
         "user_id": user.id,
@@ -118,7 +117,7 @@ async def submit_quiz_by_lesson_id(data: QuizSubmit, quiz = Depends(_get_current
 
 
 @lesson_quiz_router.get("/submission", response_model=list[QuizResult], tags=["Lesson", "Quiz"])
-async def read_submit_history_by_lesson_id(limit: int = 10, offset: int = 0, quiz = Depends(_get_current_lesson_quiz), user: User = Depends(get_current_user)):
+async def read_submit_history_by_lesson_id(limit: int = 10, offset: int = 0, quiz: QuizCrud = Depends(_get_current_lesson_quiz), user: UserCrud = Depends(get_current_user)):
     return [
         await _get_result_for(quiz_taken.id)
         for quiz_taken in await QuizTakenCrud.find_all_by_quiz_id_and_user_id(quiz.id, user.id, limit, offset)
