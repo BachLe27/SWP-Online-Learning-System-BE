@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from ..database.lesson import LessonCrud
+from ..database.user import UserRole
 from ..database.quiz import AnswerCrud, QuestionCrud, QuizCrud, QuizTakenCrud, QuizTakenDetailCrud
 from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import get_current_user, require_author, require_existed
@@ -41,13 +42,13 @@ async def _get_result_for(id: str):
 
 
 @lesson_quiz_router.get("", response_model=Quiz, tags=["Lesson", "Quiz"])
-async def read_quiz_by_lesson_id(quiz = Depends(_get_current_lesson_quiz)):
+async def read_quiz_by_lesson_id(quiz = Depends(_get_current_lesson_quiz), user: User = Depends(get_current_user)):
     return {
         **quiz,
         "questions": [
             {
                 **question,
-                "answers": await AnswerCrud.find_all_by_question_id_no_limit(question.id),
+                "answers": await AnswerCrud.find_all_by_question_id_no_limit(question.id, hide_answer=user.role == UserRole.USER),
                 "has_more_than_one_correct_answer": await AnswerCrud.count_correct_by_question_id(question.id) > 1
             }
             for question in await QuestionCrud.find_all_by_quiz_id_no_limit(quiz.id)

@@ -50,7 +50,12 @@ class AnswerCrud(Crud, Base):
         )
 
     @classmethod
-    async def find_all_by_question_id_no_limit(cls, question_id: str):
+    async def find_all_by_question_id_no_limit(cls, question_id: str, hide_answer: bool = False):
+        if hide_answer:
+            return await cls.fetch_all(
+                select(cls.id, cls.created_at, cls.updated_at, cls.content)
+                    .where(cls.question_id == question_id)
+            )
         return await cls.find_all_by_attr_no_limit(cls.question_id, question_id)
 
     @classmethod

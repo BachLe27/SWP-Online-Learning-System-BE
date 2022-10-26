@@ -36,6 +36,7 @@ class Quiz(CommonAttrs):
     class Question(CommonAttrs):
         class Answer(CommonAttrs):
             content: str
+            is_correct: bool | None
         content: str
         answers : list[Answer]
         has_more_than_one_correct_answer: bool

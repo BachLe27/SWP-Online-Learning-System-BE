@@ -3,8 +3,6 @@ from os import getenv, urandom
 
 from jose import JWTError, jwt
 
-from ..exception.http import CredentialException
-
 SECRET_KEY = getenv("JWT_SECRET_KEY", urandom(32))
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
@@ -21,7 +19,4 @@ def create_token(data: dict, type: str) -> str:
     )
 
 def decode_token(token: str) -> dict:
-    try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except JWTError:
-        raise CredentialException()
+    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
