@@ -9,6 +9,15 @@ from ..schema.post import Comment, CommentCreate, Post, PostCreate, PostUpdate
 
 post_router = APIRouter()
 
+@post_router.get("", response_model=list[Post], tags=["Post"])
+async def read_all_posts(search: str = "", limit: int = 10, offset: int = 0):
+    return await PostCrud.find_all(search, limit, offset)
+
+
+@post_router.get("/created", response_model=list[Post], tags=["Staff", "Post"])
+async def read_created_posts(search: str = "", limit: int = 10, offset: int = 0, user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.STAFF))):
+    return await PostCrud.find_all_by_author_id(user.id, search, limit, offset)
+
 
 @post_router.post("", response_model=Detail, tags=["Staff", "Post"])
 async def create_post(data: PostCreate, user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.STAFF))):
