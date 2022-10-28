@@ -8,6 +8,7 @@ class LessonCreate(BaseModel):
     duration: int
     description: str
     content: str
+    video_url: str | None
 
 
 class LessonUpdate(BaseModel):
@@ -15,6 +16,7 @@ class LessonUpdate(BaseModel):
     duration: int | None
     description: str | None
     content: str | None
+    video_url: str | None
 
 
 class Lesson(CommonAttrs):
@@ -22,5 +24,6 @@ class Lesson(CommonAttrs):
     duration: int
     description: str
     content: str
+    video_url: str | None
     chapter_id: str
     has_quiz: bool

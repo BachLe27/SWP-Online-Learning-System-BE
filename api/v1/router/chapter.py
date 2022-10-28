@@ -40,7 +40,7 @@ async def read_chapter_lessons_by_chapter_id(limit: int = 10, offset: int = 0, c
 
 
 @chapter_router.post("/{id}/lesson", response_model=Detail, tags=["Expert", "Chapter", "Lesson"])
-async def create_chapter_lesson_by_id(data: LessonCreate, chapter: ChapterCrud = Depends(require_author(ChapterCrud))):
+async def create_chapter_lesson_by_chapter_id(data: LessonCreate, chapter: ChapterCrud = Depends(require_author(ChapterCrud))):
     return {
         "detail": await LessonCrud.create({
             **data.dict(),

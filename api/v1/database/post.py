@@ -8,6 +8,7 @@ class PostCrud(Crud, Base):
 
     title = Column(String(256), nullable=False)
     content = Column(Text, nullable=False)
+    cover = Column(Text)
     author_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod

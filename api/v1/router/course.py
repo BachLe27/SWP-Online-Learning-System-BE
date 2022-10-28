@@ -90,12 +90,12 @@ async def read_course_overview_by_id(course: CourseCrud = Depends(require_existe
 
 
 @course_router.get("/{id}/chapter", response_model=list[Chapter], tags=["Course", "Chapter"])
-async def read_course_chapters_by_id(limit: int = 10, offset: int = 0, course: CourseCrud = Depends(require_existed(CourseCrud))):
+async def read_course_chapters_by_course_id(limit: int = 10, offset: int = 0, course: CourseCrud = Depends(require_existed(CourseCrud))):
     return await ChapterCrud.find_all_by_course_id(course.id, limit, offset)
 
 
 @course_router.post("/{id}/chapter", response_model=Detail, tags=["Expert", "Course", "Chapter"])
-async def create_course_chapter_by_id(data: ChapterCreate, course: CourseCrud = Depends(require_author(CourseCrud))):
+async def create_course_chapter_by_course_id(data: ChapterCreate, course: CourseCrud = Depends(require_author(CourseCrud))):
     return {
         "detail": await ChapterCrud.create({
             **data.dict(),
@@ -106,7 +106,7 @@ async def create_course_chapter_by_id(data: ChapterCreate, course: CourseCrud = 
 
 
 @course_router.get("/{id}/learner", response_model=list[User], tags=["Course"])
-async def read_course_learners_by_id(search: str = "", limit: int = 10, offset: int = 0, course: CourseCrud = Depends(require_existed(CourseCrud))):
+async def read_course_learners_by_course_id(search: str = "", limit: int = 10, offset: int = 0, course: CourseCrud = Depends(require_existed(CourseCrud))):
     return await EnrollmentCrud.find_all_users_by_course_id(course.id, search, limit, offset)
 
 

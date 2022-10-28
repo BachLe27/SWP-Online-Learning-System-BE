@@ -12,6 +12,7 @@ class LessonCrud(Crud, Base):
     duration = Column(Integer, nullable=False)
     description = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
+    video_url = Column(Text)
     chapter_id = Column(String(36), ForeignKey("Chapters.id", ondelete="CASCADE"), nullable=False)
     author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 

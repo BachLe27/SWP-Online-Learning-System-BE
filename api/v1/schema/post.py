@@ -1,22 +1,26 @@
 from pydantic import BaseModel
 
 from .base import CommonAttrs
+from .user import User
 
 
 class PostCreate(BaseModel):
     title: str
     content: str
+    cover: str | None
 
 
 class PostUpdate(BaseModel):
     title: str | None
     content: str | None
+    cover: str | None
 
 
 class Post(CommonAttrs):
     title: str
     content: str
-    author_id: str
+    author: User
+    cover: str | None
 
 
 class CommentCreate(BaseModel):
@@ -29,5 +33,4 @@ class CommentUpdate(BaseModel):
 
 class Comment(BaseModel):
     content: str
-    author_id: str
-    post_id: str
+    author: User
