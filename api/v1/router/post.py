@@ -1,9 +1,8 @@
-from api.v1.database.user import UserCrud, UserRole
+from api.v1.database.user import UserCrud
 from fastapi import APIRouter, Depends
 
 from ..database.post import CommentCrud, PostCrud
-from ..middleware.auth import (get_current_user, require_author,
-                               require_existed, require_roles)
+from ..middleware.auth import get_current_user, require_author, require_existed
 from ..schema.base import Detail
 from ..schema.post import Comment, CommentCreate, Post, PostCreate, PostUpdate
 
@@ -21,7 +20,7 @@ async def read_all_posts(search: str = "", limit: int = 10, offset: int = 0):
 
 
 @post_router.get("/created", response_model=list[Post], tags=["Staff", "Post"])
-async def read_created_posts(search: str = "", limit: int = 10, offset: int = 0, user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.STAFF))):
+async def read_created_posts(search: str = "", limit: int = 10, offset: int = 0, user: UserCrud = Depends(get_current_user)):
     return [
         {
             **post,
@@ -32,7 +31,7 @@ async def read_created_posts(search: str = "", limit: int = 10, offset: int = 0,
 
 
 @post_router.post("", response_model=Detail, tags=["Staff", "Post"])
-async def create_post(data: PostCreate, user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.STAFF))):
+async def create_post(data: PostCreate, user: UserCrud = Depends(get_current_user)):
     return {
         "detail": await PostCrud.create({
             **data.dict(),
