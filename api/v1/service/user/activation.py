@@ -8,7 +8,7 @@ from ..mailing import send_email
 ACTIVATION_URL = getenv("FRONTEND_URL_ACTIVATION")
 
 activation_mail = f"""
-{ACTIVATION_URL}?token={{ttoken}}
+{ACTIVATION_URL}?token={{token}}
 """
 
 async def send_activation_email(data: dict):
