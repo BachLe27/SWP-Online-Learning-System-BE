@@ -1,11 +1,14 @@
 from datetime import date
+from os import getenv
 
 from ...database.user import UserCrud
 from ..jwt import JWTError, create_token, decode_token
 from ..mailing import send_email
 
-activation_mail = """
-http://localhost:8000/user/activate?token={token}
+ACTIVATION_URL = getenv("FRONTEND_URL_ACTIVATION")
+
+activation_mail = f"""
+{ACTIVATION_URL}?token={{ttoken}}
 """
 
 async def send_activation_email(data: dict):
