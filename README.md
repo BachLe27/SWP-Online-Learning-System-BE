@@ -2,7 +2,7 @@
 
 1. Install dependencies `pip install -r requirements.txt`
 
-2. Edit `api/v1/.env.example` and copy to `.env`
+2. Edit `api/v1/example.env` and copy to `.env`
 
 3. Run `python main.py`
 

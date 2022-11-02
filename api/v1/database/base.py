@@ -12,33 +12,30 @@ DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:///database.db")
 engine = create_async_engine(DATABASE_URL)
 Base = declarative_base()
 
-
 class Crud:
-    db = Database(DATABASE_URL)
-
     id = Column(String(36), primary_key=True, index=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
     @classmethod
     async def execute(cls, stmt: str):
-        async with cls.db:
-            return await cls.db.execute(stmt)
+        async with Database(DATABASE_URL) as db:
+            return await db.execute(stmt)
 
     @classmethod
     async def fetch_one(cls, stmt: str):
-        async with cls.db:
-            return await cls.db.fetch_one(stmt)
+        async with Database(DATABASE_URL) as db:
+            return await db.fetch_one(stmt)
 
     @classmethod
     async def fetch_all(cls, stmt: str):
-        async with cls.db:
-            return await cls.db.fetch_all(stmt)
+        async with Database(DATABASE_URL) as db:
+            return await db.fetch_all(stmt)
 
     @classmethod
     async def fetch_val(cls, stmt: str):
-        async with cls.db:
-            return await cls.db.fetch_val(stmt)
+        async with Database(DATABASE_URL) as db:
+            return await db.fetch_val(stmt)
 
     @classmethod
     async def create(cls, attrs: dict) -> str:

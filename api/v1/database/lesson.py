@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Text, select
 from sqlalchemy.sql.functions import func
 
 from .base import Base, Crud
-from .course import CourseCrud
+from .chapter import ChapterCrud
 
 
 class LessonCrud(Crud, Base):
@@ -20,7 +20,8 @@ class LessonCrud(Crud, Base):
     async def sum_duration_by_course_id(cls, course_id: str):
         return await cls.fetch_val(
             select(func.sum(cls.duration))
-                .where(CourseCrud.id == course_id)
+                .join(ChapterCrud)
+                .where(ChapterCrud.course_id == course_id)
         ) or 0
 
     @classmethod

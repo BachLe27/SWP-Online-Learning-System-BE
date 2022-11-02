@@ -4,10 +4,8 @@ from aiofiles import open as aopen
 from aiofiles.os import makedirs as amakedirs
 from fastapi import UploadFile
 
-
 UPLOAD_ROOT = Path("upload")
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
-
 
 async def upload_file(file: UploadFile, path: str|Path) -> bool:
     try:
@@ -20,7 +18,6 @@ async def upload_file(file: UploadFile, path: str|Path) -> bool:
     except Exception as e:
         print(e)
         return False
-
 
 async def download_file(path: str|Path):
     path = UPLOAD_ROOT/path
