@@ -31,6 +31,6 @@ class CommentUpdate(BaseModel):
     content: str
 
 
-class Comment(BaseModel):
+class Comment(CommonAttrs):
     content: str
     author: User
