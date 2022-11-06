@@ -38,3 +38,7 @@ class CommentCrud(Crud, Base):
     @classmethod
     async def find_all_by_post_id(cls, post_id: str, limit: int, offset: int):
         return await cls.find_all_by_attr(cls.post_id, post_id, limit, offset)
+
+    @classmethod
+    async def count_by_post_id(cls, post_id: str):
+        return await cls.count_by_attr(cls.post_id, post_id)

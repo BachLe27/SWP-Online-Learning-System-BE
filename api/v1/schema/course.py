@@ -5,6 +5,18 @@ from .base import CommonAttrs
 from .user import User
 
 
+class CategoryCreate(BaseModel):
+    name: str
+
+
+class CategoryUpdate(BaseModel):
+    name: str
+
+
+class Category(CommonAttrs):
+    name: str
+
+
 class CourseCreate(BaseModel):
     title: str
     description: str
@@ -48,7 +60,7 @@ class Course(CommonAttrs):
     description: str
     level: str
     is_public: bool
-    category_id: str
+    category: Category
     author: User
     image: str | None
 

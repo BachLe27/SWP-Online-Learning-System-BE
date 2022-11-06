@@ -1,6 +1,5 @@
-from .category import CategoryCrud
 from .chapter import ChapterCrud
-from .course import CourseCrud, EnrollmentCrud, FeedbackCrud
+from .course import CategoryCrud, CourseCrud, EnrollmentCrud, FeedbackCrud
 from .lesson import LessonCrud
 from .price_package import PricePackageCrud, PurchaseCrud
 from .quiz import (AnswerCrud, QuestionCrud, QuizCrud, QuizTakenCrud,

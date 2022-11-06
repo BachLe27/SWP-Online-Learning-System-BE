@@ -70,6 +70,10 @@ class Crud:
         return await cls.fetch_val(select(func.count(cls.id)).where(attr == value))
 
     @classmethod
+    async def count_all(cls):
+        return await cls.fetch_val(select(func.count(cls.id)))
+
+    @classmethod
     async def exist_by_id(cls, id: str):
         return await cls.find_by_id(id) is not None
 

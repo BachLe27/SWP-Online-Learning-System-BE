@@ -5,6 +5,12 @@ from .base import Base, Crud
 from .user import UserCrud
 
 
+class CategoryCrud(Crud, Base):
+    __tablename__ = "Categories"
+
+    name = Column(String(256), nullable=False)
+
+
 class CourseLevel:
     BEGINNER = "BEGINNER"
     INTERMEDIATE = "INTERMEDIATE"

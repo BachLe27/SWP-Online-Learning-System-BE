@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 
-from ..database.category import CategoryCrud
+from ..database.course import CategoryCrud
 from ..database.user import UserRole
 from ..middleware.auth import exclude_roles, require_existed
 from ..schema.base import Detail
-from ..schema.category import Category, CategoryCreate, CategoryUpdate
+from ..schema.course import Category, CategoryCreate, CategoryUpdate
 
 auth_middleware = {
     "dependencies": [Depends(exclude_roles(UserRole.USER))],

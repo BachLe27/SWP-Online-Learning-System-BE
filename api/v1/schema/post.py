@@ -20,6 +20,7 @@ class Post(CommonAttrs):
     title: str
     content: str
     author: User
+    comment_count: int
     cover: str | None
 
 

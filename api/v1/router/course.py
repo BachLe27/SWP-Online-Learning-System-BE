@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 
 from ..database.chapter import ChapterCrud
-from ..database.course import CourseCrud, EnrollmentCrud, FeedbackCrud
+from ..database.course import (CategoryCrud, CourseCrud, EnrollmentCrud,
+                               FeedbackCrud)
 from ..database.lesson import LessonCrud
 from ..database.user import UserCrud, UserRole
 from ..exception.http import ConflictException
@@ -26,6 +27,7 @@ async def read_all_courses(
     return [
         {
             **course,
+            "category": await CategoryCrud.find_by_id(course.category_id),
             "author": await UserCrud.find_by_id(course.author_id)
         }
         for course in await CourseCrud.find_all(search, levels, limit, offset)
@@ -43,6 +45,7 @@ async def read_created_courses(
     return [
         {
             **course,
+            "category": await CategoryCrud.find_by_id(course.category_id),
             "author": await UserCrud.find_by_id(course.author_id)
         }
         for course in await CourseCrud.find_all_by_author_id(user.id, search, levels, limit, offset)
@@ -54,6 +57,7 @@ async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int =
     return [
         {
             **course,
+            "category": await CategoryCrud.find_by_id(course.category_id),
             "author": await UserCrud.find_by_id(course.author_id)
         }
         for course in await EnrollmentCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
@@ -74,6 +78,7 @@ async def create_course(data: CourseCreate, user: UserCrud = Depends(require_rol
 async def read_course_by_id(course: CourseCrud = Depends(require_existed(CourseCrud))):
     return {
         **course,
+        "category": await CategoryCrud.find_by_id(course.category_id),
         "author": await UserCrud.find_by_id(course.author_id)
     }
 

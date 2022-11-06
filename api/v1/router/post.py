@@ -13,24 +13,26 @@ async def read_all_posts(search: str = "", limit: int = 10, offset: int = 0):
     return [
         {
             **post,
+            "comment_count": await CommentCrud.count_by_post_id(post.id),
             "author": await UserCrud.find_by_id(post.author_id),
         }
         for post in await PostCrud.find_all(search, limit, offset)
     ]
 
 
-@post_router.get("/created", response_model=list[Post], tags=["Staff", "Post"])
+@post_router.get("/created", response_model=list[Post], tags=["Post"])
 async def read_created_posts(search: str = "", limit: int = 10, offset: int = 0, user: UserCrud = Depends(get_current_user)):
     return [
         {
             **post,
+            "comment_count": await CommentCrud.count_by_post_id(post.id),
             "author": await UserCrud.find_by_id(post.author_id),
         }
         for post in await PostCrud.find_all_by_author_id(user.id, search, limit, offset)
     ]
 
 
-@post_router.post("", response_model=Detail, tags=["Staff", "Post"])
+@post_router.post("", response_model=Detail, tags=["Post"])
 async def create_post(data: PostCreate, user: UserCrud = Depends(get_current_user)):
     return {
         "detail": await PostCrud.create({
@@ -44,17 +46,18 @@ async def create_post(data: PostCreate, user: UserCrud = Depends(get_current_use
 async def read_post_by_id(post: PostCrud = Depends(require_existed(PostCrud))):
     return {
         **post,
+        "comment_count": await CommentCrud.count_by_post_id(post.id),
         "author": await UserCrud.find_by_id(post.author_id),
     }
 
 
-@post_router.put("/{id}", response_model=Detail, tags=["Staff", "Post"])
+@post_router.put("/{id}", response_model=Detail, tags=["Post"])
 async def update_post_by_id(data: PostUpdate, post: PostCrud = Depends(require_author(PostCrud))):
     await PostCrud.update_by_id(post.id, data.dict(exclude_none=True))
     return {"detail": "Updated"}
 
 
-@post_router.delete("/{id}", response_model=Detail, tags=["Staff", "Post"])
+@post_router.delete("/{id}", response_model=Detail, tags=["Post"])
 async def delete_post_by_id(post: PostCrud = Depends(require_author(PostCrud))):
     await PostCrud.delete_by_id(post.id)
     return {"detail": "Deleted"}
