@@ -4,7 +4,7 @@ from ..database.lesson import LessonCrud
 from ..database.quiz import (AnswerCrud, QuestionCrud, QuizCrud, QuizTakenCrud,
                              QuizTakenDetailCrud)
 from ..database.user import UserCrud, UserRole
-from ..exception.http import ConflictException, NotFoundException
+from ..exception.http import ConflictException, BadRequestException, NotFoundException
 from ..middleware.auth import get_current_user, require_author, require_existed
 from ..schema.base import Detail
 from ..schema.quiz import (QuestionCreate, Quiz, QuizCreate, QuizResult,
@@ -15,16 +15,17 @@ lesson_quiz_router = APIRouter()
 
 async def _get_current_lesson_quiz(lesson: LessonCrud = Depends(require_existed(LessonCrud))):
     if (quiz := await QuizCrud.find_by_lesson_id(lesson.id)) is None:
-        NotFoundException()
+        raise NotFoundException()
     return quiz
 
 
-async def _get_result_for(id: str):
+async def _get_result_for(quiz_taken: QuizTakenCrud):
+    quiz = await QuizCrud.find_by_id(quiz_taken.quiz_id)
     return {
-        "correct_count": 10,
-        "total_count": 10,
-        "to_pass": 0.8,
-        "is_passed": True,
+        "correct_count": (correct_count := 10),
+        "total_count": (total_count := 10),
+        "to_pass": (to_pass := quiz.to_pass),
+        "is_passed": correct_count/total_count >= to_pass,
         "questions": [
             {
                 "id": "str",
@@ -102,23 +103,27 @@ async def submit_quiz_by_lesson_id(data: QuizSubmit, quiz: QuizCrud = Depends(_g
         "quiz_id": quiz.id,
         "user_id": user.id,
     })
-    for question in data.questions:
-        if not await QuestionCrud.exist_by_id(question.id):
-            raise NotFoundException()
-        for answer_id in question.answer_ids:
-            if not await AnswerCrud.exist_by_id(answer_id):
-                raise NotFoundException()
-            await QuizTakenDetailCrud.create({
-                "quiz_taken_id": quiz_taken_id,
-                "question_id": question.id,
-                "answer_id": answer_id,
-            })
-    return await _get_result_for(quiz_taken_id)
+    try:
+        for question in data.questions:
+            if not await QuestionCrud.exist_by_id_and_quiz_id(question.id, quiz.id):
+                raise BadRequestException(f"Question '{question.id}' not found for quiz '{quiz.id}'")
+            for answer_id in question.answer_ids:
+                if not await AnswerCrud.exist_by_id_and_question_id(answer_id, question.id):
+                    raise BadRequestException(f"Answer '{answer_id}' not found for question '{question.id}'")
+                await QuizTakenDetailCrud.create({
+                    "quiz_taken_id": quiz_taken_id,
+                    "question_id": question.id,
+                    "answer_id": answer_id,
+                })
+    except BadRequestException:
+        await QuizTakenCrud.delete_by_id(quiz_taken_id)
+        raise
+    return await _get_result_for(await QuizTakenCrud.find_by_id(quiz_taken_id))
 
 
 @lesson_quiz_router.get("/submission", response_model=list[QuizResult], tags=["Lesson", "Quiz"])
 async def read_submit_history_by_lesson_id(limit: int = 10, offset: int = 0, quiz: QuizCrud = Depends(_get_current_lesson_quiz), user: UserCrud = Depends(get_current_user)):
     return [
-        await _get_result_for(quiz_taken.id)
+        await _get_result_for(quiz_taken)
         for quiz_taken in await QuizTakenCrud.find_all_by_quiz_id_and_user_id(quiz.id, user.id, limit, offset)
     ]

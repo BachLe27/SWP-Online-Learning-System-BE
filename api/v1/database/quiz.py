@@ -34,6 +34,10 @@ class QuestionCrud(Crud, Base):
     async def find_all_by_quiz_id_no_limit(cls, quiz_id: str):
         return await cls.find_all_by_attr_no_limit(cls.quiz_id, quiz_id)
 
+    @classmethod
+    async def exist_by_id_and_quiz_id(cls, id: str, quiz_id: str):
+        return (question := await cls.find_by_id(id)) is not None and question.quiz_id == quiz_id
+
 
 class AnswerCrud(Crud, Base):
     __tablename__ = "Answers"
@@ -61,6 +65,10 @@ class AnswerCrud(Crud, Base):
     @classmethod
     async def delete_all_by_question_id(cls, question_id: str):
         return await cls.delete_all_by_attr(cls.question_id, question_id)
+
+    @classmethod
+    async def exist_by_id_and_question_id(cls, id: str, question_id: str):
+        return (answer := await cls.find_by_id(id)) is not None and answer.question_id == question_id
 
 
 class QuizTakenCrud(Crud, Base):
