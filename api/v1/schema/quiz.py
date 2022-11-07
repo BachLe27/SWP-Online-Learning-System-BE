@@ -13,7 +13,14 @@ class QuizCreate(BaseModel):
         return to_pass
 
 
-QuizUpdate = QuizCreate
+class QuizUpdate(BaseModel):
+    to_pass: float
+
+    @validator("to_pass")
+    def to_pass_must_be_between_0_and_1(cls, to_pass):
+        if not 0 <= to_pass <= 1:
+            raise ValueError("to_pass must be between 0 and 1")
+        return to_pass
 
 
 class QuestionCreate(BaseModel):

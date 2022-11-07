@@ -22,22 +22,20 @@ async def _get_current_lesson_quiz(lesson: LessonCrud = Depends(require_existed(
 async def _get_result_for(quiz_taken: QuizTakenCrud):
     quiz = await QuizCrud.find_by_id(quiz_taken.quiz_id)
     return {
-        "correct_count": (correct_count := 10),
-        "total_count": (total_count := 10),
+        "questions": (
+            questions := [
+                {
+                    **question,
+                    "answers": (answers := await QuizTakenDetailCrud.find_all_answers_by_question_id_no_limit(question.id)),
+                    "is_correct": sum(1 for answer in answers if answer.is_correct) == await AnswerCrud.count_correct_by_question_id(question.id),
+                }
+                for question in await QuestionCrud.find_all_by_quiz_id_no_limit(quiz.id)
+            ]
+        ),
+        "correct_count": (correct_count := sum(1 for question in questions if question["is_correct"])),
+        "total_count": (total_count := await QuestionCrud.count_by_quiz_id(quiz.id)),
         "to_pass": (to_pass := quiz.to_pass),
         "is_passed": correct_count/total_count >= to_pass,
-        "questions": [
-            {
-                "id": "str",
-                "is_correct": True,
-                "answers": [
-                    {
-                        "id": "str",
-                        "is_correct": True,
-                    }
-                ]
-            }
-        ],
     }
 
 

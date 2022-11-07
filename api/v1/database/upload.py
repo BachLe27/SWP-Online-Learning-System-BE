@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, ForeignKey, String, Text, insert
+from sqlalchemy import Column, ForeignKey, String, Text
 
 from .base import Base, Crud
 
@@ -20,5 +20,5 @@ class UploadCrud(Crud, Base):
         attrs["created_at"] = datetime.utcnow()
         attrs["updated_at"] = datetime.utcnow()
         attrs["file_path"] = attrs["file_path"].format(id=id)
-        await cls.execute(insert(cls).values(**attrs))
+        await cls.execute(cls.insert().values(**attrs))
         return id

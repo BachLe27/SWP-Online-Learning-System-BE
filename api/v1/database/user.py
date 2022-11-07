@@ -1,7 +1,6 @@
 from datetime import date
 
-from sqlalchemy import (Boolean, Column, Date, ForeignKey, String, Text,
-                        select, update)
+from sqlalchemy import Boolean, Column, Date, String, Text
 
 from .base import Base, Crud
 
@@ -27,7 +26,6 @@ class UserCrud(Crud, Base):
     address = Column(Text, nullable=False)
     bio = Column(Text, nullable=False)
     role = Column(String(256), nullable=False)
-    # avatar = Column(String(36), ForeignKey("Uploads.id"))
     avatar = Column(Text)
 
     @classmethod
@@ -52,11 +50,11 @@ class UserCrud(Crud, Base):
 
     @classmethod
     async def find_by_username(cls, username: str):
-        return await cls.fetch_one(select(cls).where(cls.username == username))
+        return await cls.fetch_one(cls.select().where(cls.username == username))
 
     @classmethod
     async def find_by_email(cls, email: str):
-        return await cls.fetch_one(select(cls).where(cls.email == email))
+        return await cls.fetch_one(cls.select().where(cls.email == email))
 
     @classmethod
     async def exist_by_username(cls, username: str):
@@ -69,11 +67,12 @@ class UserCrud(Crud, Base):
     @classmethod
     async def find_all(cls, search: str, roles: list[str], limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
-                .where((cls.full_name.contains(search)) & (cls.role.in_(roles)))
+            cls.select()
+                .where(cls.full_name.contains(search))
+                .where(cls.role.in_(roles))
                 .limit(limit).offset(offset)
         )
 
     @classmethod
     async def update_role_by_id(cls, id: str, role: str):
-        return await cls.execute(update(cls).values(role=role).where(cls.id == id))
+        return await cls.execute(cls.update().where(cls.id == id).values(role=role))

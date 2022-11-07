@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Text, select
+from sqlalchemy import Column, ForeignKey, String, Text
 
 from .base import Base, Crud
 
@@ -14,7 +14,7 @@ class PostCrud(Crud, Base):
     @classmethod
     async def find_all(cls, search: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
+            cls.select()
                 .where(cls.title.contains(search))
                 .limit(limit).offset(offset)
         )
@@ -22,8 +22,9 @@ class PostCrud(Crud, Base):
     @classmethod
     async def find_all_by_author_id(cls, author_id: str, search: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
-                .where((cls.author_id == author_id) & (cls.title.contains(search)))
+            cls.select()
+                .where(cls.author_id == author_id)
+                .where(cls.title.contains(search))
                 .limit(limit).offset(offset)
         )
 

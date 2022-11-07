@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Text, select
+from sqlalchemy import Column, ForeignKey, String, Text
 
 from .base import Base, Crud
 
@@ -14,7 +14,7 @@ class ChapterCrud(Crud, Base):
     @classmethod
     async def find_all_by_course_id(cls, course_id: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
+            cls.select()
                 .where(cls.course_id == course_id)
                 .limit(limit).offset(offset)
         )

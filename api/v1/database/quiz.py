@@ -14,7 +14,7 @@ class QuizCrud(Crud, Base):
     @classmethod
     async def find_by_lesson_id(cls, lesson_id: str):
         return await cls.fetch_one(
-            select(cls)
+            cls.select()
                 .where(cls.lesson_id == lesson_id)
         )
 
@@ -38,6 +38,10 @@ class QuestionCrud(Crud, Base):
     async def exist_by_id_and_quiz_id(cls, id: str, quiz_id: str):
         return (question := await cls.find_by_id(id)) is not None and question.quiz_id == quiz_id
 
+    @classmethod
+    async def count_by_quiz_id(cls, quiz_id: str):
+        return await cls.count_by_attr(cls.quiz_id, quiz_id)
+
 
 class AnswerCrud(Crud, Base):
     __tablename__ = "Answers"
@@ -49,8 +53,9 @@ class AnswerCrud(Crud, Base):
     @classmethod
     async def count_correct_by_question_id(cls, question_id: str):
         return await cls.fetch_val(
-            select(func.count(cls.id))
-                .where((cls.question_id == question_id) & (cls.is_correct))
+            cls.count()
+                .where(cls.question_id == question_id)
+                .where(cls.is_correct)
         )
 
     @classmethod
@@ -80,8 +85,9 @@ class QuizTakenCrud(Crud, Base):
     @classmethod
     async def find_all_by_quiz_id_and_user_id(cls, quiz_id: str, user_id: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
-                .where((cls.quiz_id == quiz_id) & (cls.user_id == user_id))
+            cls.select()
+                .where(cls.quiz_id == quiz_id)
+                .where(cls.user_id == user_id)
                 .limit(limit).offset(offset)
         )
 
@@ -96,3 +102,11 @@ class QuizTakenDetailCrud(Crud, Base):
     @classmethod
     async def find_all_by_quiz_taken_id_no_limit(cls, quiz_taken_id: str):
         return await cls.find_all_by_attr_no_limit(cls.quiz_taken_id, quiz_taken_id)
+
+    @classmethod
+    async def find_all_answers_by_question_id_no_limit(cls, question_id: str):
+        return await cls.fetch_all(
+            AnswerCrud.select()
+                .join(cls)
+                .where(cls.question_id == question_id)
+        )

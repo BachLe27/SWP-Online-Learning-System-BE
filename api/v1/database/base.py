@@ -3,9 +3,11 @@ from os import getenv
 from uuid import uuid4
 
 from databases import Database
-from sqlalchemy import Column, DateTime, String, delete, insert, select, update
+from sqlalchemy import Column, DateTime, String
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import (Delete, Insert, Select, Update, delete, insert,
+                            select, update)
 from sqlalchemy.sql.functions import func
 
 DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:///database.db")
@@ -38,40 +40,60 @@ class Crud:
             return await db.fetch_val(stmt)
 
     @classmethod
+    def select(cls) -> Select:
+        return select(cls)
+
+    @classmethod
+    def insert(cls) -> Insert:
+        return insert(cls)
+
+    @classmethod
+    def update(cls) -> Update:
+        return update(cls)
+
+    @classmethod
+    def delete(cls) -> Delete:
+        return delete(cls)
+
+    @classmethod
+    def count(cls) -> Select:
+        return select(func.count(cls.id))
+
+    @classmethod
     async def create(cls, attrs: dict) -> str:
         attrs["id"] = str(uuid4())
         attrs["created_at"] = datetime.utcnow()
         attrs["updated_at"] = datetime.utcnow()
-        await cls.execute(insert(cls).values(**attrs))
+        await cls.execute(cls.insert().values(**attrs))
         return attrs["id"]
 
     @classmethod
     async def find_by_id(cls, id: str):
-        return await cls.fetch_one(select(cls).where(cls.id == id))
+        return await cls.fetch_one(cls.select().where(cls.id == id))
 
     @classmethod
     async def find_all_by_attr(cls, attr, value, limit: int, offset: int):
-        return await cls.fetch_all(select(cls).where(attr == value).limit(limit).offset(offset))
+        return await cls.fetch_all(cls.select().where(attr == value).limit(limit).offset(offset))
 
     @classmethod
     async def find_all_by_attr_no_limit(cls, attr, value):
-        return await cls.fetch_all(select(cls).where(attr == value))
+        return await cls.fetch_all(cls.select().where(attr == value))
 
     @classmethod
     async def find_all(cls, limit: int, offset: int):
-        return await cls.fetch_all(select(cls).limit(limit).offset(offset))
+        return await cls.fetch_all(cls.select().limit(limit).offset(offset))
 
     @classmethod
     async def find_all_no_limit(cls):
-        return await cls.fetch_all(select(cls))
+        return await cls.fetch_all(cls.select())
 
     @classmethod
     async def count_by_attr(cls, attr, value):
-        return await cls.fetch_val(select(func.count(cls.id)).where(attr == value))
+        return await cls.fetch_val(cls.count().where(attr == value))
 
     @classmethod
     async def count_all(cls):
-        return await cls.fetch_val(select(func.count(cls.id)))
+        return await cls.fetch_val(cls.count())
 
     @classmethod
     async def exist_by_id(cls, id: str):
@@ -80,12 +102,12 @@ class Crud:
     @classmethod
     async def update_by_id(cls, id: str, attrs: dict):
         attrs["updated_at"] = datetime.utcnow()
-        return await cls.execute(update(cls).values(**attrs).where(cls.id == id))
+        return await cls.execute(cls.update().where(cls.id == id).values(**attrs))
 
     @classmethod
     async def delete_by_id(cls, id: str):
-        return await cls.execute(delete(cls).where(cls.id == id))
+        return await cls.execute(cls.delete().where(cls.id == id))
 
     @classmethod
     async def delete_all_by_attr(cls, attr, value):
-        return await cls.execute(delete(cls).where(attr == value))
+        return await cls.execute(cls.delete().where(attr == value))

@@ -27,7 +27,7 @@ class LessonCrud(Crud, Base):
     @classmethod
     async def find_all_by_chapter_id(cls, chapter_id: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
+            cls.select()
                 .where(cls.chapter_id == chapter_id)
                 .limit(limit).offset(offset)
         )

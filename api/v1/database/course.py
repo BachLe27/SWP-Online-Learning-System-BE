@@ -24,7 +24,6 @@ class CourseCrud(Crud, Base):
     title = Column(String(256), nullable=False)
     description = Column(Text, nullable=False)
     level = Column(String(256), nullable=False)
-    # image = Column(String(36), ForeignKey("Uploads.id"))
     image = Column(Text)
     is_public = Column(Boolean, nullable=False)
     category_id = Column(String(36), ForeignKey("Categories.id", ondelete="CASCADE"), nullable=False)
@@ -33,16 +32,19 @@ class CourseCrud(Crud, Base):
     @classmethod
     async def find_all(cls, search: str, levels: list[str], limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
-                .where((cls.title.contains(search)) & (cls.level.in_(levels)))
+            cls.select()
+                .where(cls.title.contains(search))
+                .where(cls.level.in_(levels))
                 .limit(limit).offset(offset)
         )
 
     @classmethod
     async def find_all_by_author_id(cls, author_id: str, search: str, levels: list[str], limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
-                .where((cls.author_id == author_id) & (cls.title.contains(search)) & (cls.level.in_(levels)))
+            cls.select()
+                .where(cls.author_id == author_id)
+                .where(cls.title.contains(search))
+                .where(cls.level.in_(levels))
                 .limit(limit).offset(offset)
         )
 
@@ -56,8 +58,9 @@ class EnrollmentCrud(Crud, Base):
     @classmethod
     async def find_by_user_id_and_course_id(cls, user_id: str, course_id: str):
         return await cls.fetch_one(
-            select(cls)
-                .where((cls.user_id == user_id) & (cls.course_id == course_id))
+            cls.select()
+                .where(cls.user_id == user_id)
+                .where(cls.course_id == course_id)
         )
 
     @classmethod
@@ -67,18 +70,20 @@ class EnrollmentCrud(Crud, Base):
     @classmethod
     async def find_all_courses_by_user_id(cls, user_id: str, search: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(CourseCrud)
+            CourseCrud.select()
                 .join(cls)
-                .where((cls.user_id == user_id) & (CourseCrud.title.contains(search)))
+                .where(cls.user_id == user_id)
+                .where(CourseCrud.title.contains(search))
                 .limit(limit).offset(offset)
         )
 
     @classmethod
     async def find_all_users_by_course_id(cls, course_id: str, search:str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(UserCrud)
+            UserCrud.select()
                 .join(cls)
-                .where((cls.course_id == course_id) & (UserCrud.full_name.contains(search)))
+                .where(cls.course_id == course_id)
+                .where(UserCrud.full_name.contains(search))
                 .limit(limit).offset(offset)
         )
 
@@ -98,8 +103,9 @@ class FeedbackCrud(Crud, Base):
     @classmethod
     async def find_by_user_id_and_course_id(cls, user_id: str, course_id: str):
         return await cls.fetch_one(
-            select(cls)
-                .where((cls.user_id == user_id) & (cls.course_id == course_id))
+            cls.select()
+                .where(cls.user_id == user_id)
+                .where(cls.course_id == course_id)
         )
 
     @classmethod
@@ -109,7 +115,7 @@ class FeedbackCrud(Crud, Base):
     @classmethod
     async def find_all_by_course_id(cls, course_id: str, limit: int, offset: int):
         return await cls.fetch_all(
-            select(cls)
+            cls.select()
                 .where(cls.course_id == course_id)
                 .limit(limit).offset(offset)
         )
