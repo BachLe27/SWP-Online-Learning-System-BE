@@ -35,6 +35,16 @@ async def read_all_courses(
     ]
 
 
+@course_router.post("", response_model=Detail, tags=["Expert", "Course"])
+async def create_course(data: CourseCreate, user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))):
+    return {
+        "detail": await CourseCrud.create({
+            **data.dict(),
+            "author_id": user.id
+        })
+    }
+
+
 @course_router.get("/created", response_model=list[Course], tags=["Expert", "Course"])
 async def read_created_courses(
         search: str = "",
@@ -63,16 +73,6 @@ async def read_enrolled_courses(search: str = "", limit: int = 10, offset: int =
         }
         for course in await EnrollmentCrud.find_all_courses_by_user_id(user.id, search, limit, offset)
     ]
-
-
-@course_router.post("", response_model=Detail, tags=["Expert", "Course"])
-async def create_course(data: CourseCreate, user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))):
-    return {
-        "detail": await CourseCrud.create({
-            **data.dict(),
-            "author_id": user.id
-        })
-    }
 
 
 @course_router.get("/{id}", response_model=Course, tags=["Course"])

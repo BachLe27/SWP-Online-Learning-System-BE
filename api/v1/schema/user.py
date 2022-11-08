@@ -44,8 +44,12 @@ class UserChangeRole(BaseModel):
         return role
 
 
-class UserResetPassword(BaseModel):
+class UserResetPasswordRequest(BaseModel):
     email: EmailStr
+
+
+class UserResetPassword(BaseModel):
+    password: str
 
 
 class User(CommonAttrs):

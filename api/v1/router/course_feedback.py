@@ -4,6 +4,7 @@ from ..database.course import CourseCrud, FeedbackCrud
 from ..database.user import UserCrud
 from ..exception.http import ConflictException, NotFoundException
 from ..middleware.auth import get_current_user, require_existed
+from ..middleware.purchase import require_enrolled
 from ..schema.base import Detail
 from ..schema.course import Feedback, FeedbackCreate, FeedbackUpdate
 
@@ -22,7 +23,7 @@ async def read_course_feedbacks_by_course_id(limit: int = 10, offset: int = 0, c
 
 
 @course_feedback_router.post("", response_model=Detail, tags=["Course", "Feedback"])
-async def feedback_course_by_course_id(data: FeedbackCreate, course: CourseCrud = Depends(require_existed(CourseCrud)), user: UserCrud = Depends(get_current_user)):
+async def feedback_course_by_course_id(data: FeedbackCreate, course: CourseCrud = Depends(require_enrolled(CourseCrud)), user: UserCrud = Depends(get_current_user)):
     if await FeedbackCrud.exist_by_user_id_and_course_id(user.id, course.id):
         raise ConflictException()
     return {
