@@ -26,6 +26,7 @@ class PostCrud(AuthorRelatedCrud, Base):
             cls.select()
                 .where(cls.author_id == author_id)
                 .where(cls.title.contains(search))
+                .order_by(cls.created_at.desc())
                 .limit(limit).offset(offset)
         )
 
@@ -43,7 +44,12 @@ class CommentCrud(AuthorRelatedCrud, Base):
 
     @classmethod
     async def find_all_by_post_id(cls, post_id: str, limit: int, offset: int):
-        return await cls.find_all_by_attr(cls.post_id, post_id, limit, offset)
+        return await cls.fetch_all(
+            cls.select()
+                .where(cls.post_id == post_id)
+                .order_by(cls.created_at.desc())
+                .limit(limit).offset(offset)
+        )
 
     @classmethod
     async def count_by_post_id(cls, post_id: str):
