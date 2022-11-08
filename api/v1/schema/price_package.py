@@ -31,3 +31,8 @@ class Purchase(BaseModel):
     price_package_id: str
     purchase_price: float
     end_date: date
+
+
+class Order(BaseModel):
+    id: str
+    link: str

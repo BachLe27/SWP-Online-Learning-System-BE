@@ -1,8 +1,11 @@
+import asyncio
+from functools import wraps
 from os import getenv
 
 from paypalcheckoutsdk.core import (LiveEnvironment, PayPalHttpClient,
-                                   SandboxEnvironment)
-from paypalcheckoutsdk.orders import OrdersGetRequest, OrdersCreateRequest, OrdersCaptureRequest
+                                    SandboxEnvironment)
+from paypalcheckoutsdk.orders import (OrdersCaptureRequest,
+                                      OrdersCreateRequest, OrdersGetRequest)
 
 ENVIRONMENT = getenv("PAYPAL_ENVIRONMENT", "SANDBOX")
 assert ENVIRONMENT in ("SANDBOX", "LIVE"), "PAYPAL_ENVIRONMENT must be SANDBOX or LIVE"
@@ -14,9 +17,15 @@ client = PayPalHttpClient(
     else LiveEnvironment(CLIENT_ID, CLIENT_SECRET)
 )
 
-def create_order():
+def run_in_executor(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        return await asyncio.get_event_loop().run_in_executor(None, lambda: func(*args, **kwargs))
+    return wrapper
+
+@run_in_executor
+def create_order(amount: float) -> dict:
     request = OrdersCreateRequest()
-    # request.prefer('return=representation')
     request.request_body(
         {
             "intent": "CAPTURE",
@@ -24,7 +33,7 @@ def create_order():
                 {
                     "amount": {
                         "currency_code": "USD",
-                        "value": "100.00"
+                        "value": amount
                     }
                 }
             ]
@@ -32,31 +41,34 @@ def create_order():
     )
     try:
         response = client.execute(request)
-        return response.result
+        return response.result.dict()
     except Exception as e:
-        print(e.status_code)
-        print(e.headers)
         print(e.message)
-        return None
+        return {
+            "status": "EXCEPTION",
+            "message": e.message
+        }
 
-def capture_order(id: str):
-    request = OrdersCaptureRequest(id)
+@run_in_executor
+def check_order(id: str) -> dict:
     try:
-        response = client.execute(request)
-        return response.result
+        response = client.execute(OrdersGetRequest(id))
+        return response.result.dict()
     except Exception as e:
-        print(e.status_code)
-        print(e.headers)
         print(e.message)
-        return None
+        return {
+            "status": "EXCEPTION",
+            "message": e.message
+        }
 
-def check_order(id: str):
-    request = OrdersGetRequest(id)
+@run_in_executor
+def capture_order(id: str) -> dict:
     try:
-        response = client.execute(request)
-        return response.result
+        response = client.execute(OrdersCaptureRequest(id))
+        return response.result.dict()
     except Exception as e:
-        print(e.status_code)
-        print(e.headers)
         print(e.message)
-        return None
+        return {
+            "status": "EXCEPTION",
+            "message": e.message
+        }
