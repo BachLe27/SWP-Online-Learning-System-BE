@@ -26,9 +26,9 @@ class PricePackage(CommonAttrs):
     description: str
 
 
-class Purchase(BaseModel):
+class Purchase(CommonAttrs):
     user_id: str
-    price_package_id: str
+    price_package_id: str | None
     purchase_price: float
     end_date: date
 

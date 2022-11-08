@@ -11,7 +11,7 @@ class UploadCrud(AuthorRelatedCrud, Base):
 
     file_path = Column(Text, nullable=False)
     content_type = Column(String(256), nullable=False)
-    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
+    author_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
     async def create(cls, attrs: dict):

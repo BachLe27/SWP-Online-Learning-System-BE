@@ -19,7 +19,7 @@ class PurchaseCrud(Crud, Base):
     __tablename__ = "Purchases"
 
     user_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
-    price_package_id = Column(String(36), ForeignKey("PricePackages.id"), nullable=False)
+    price_package_id = Column(String(36), ForeignKey("PricePackages.id", ondelete="SET NULL"))
     purchase_price = Column(Float, nullable=False)
     end_date = Column(Date, nullable=False)
 
