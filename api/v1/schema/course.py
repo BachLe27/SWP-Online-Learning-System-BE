@@ -53,6 +53,7 @@ class CourseOverview(BaseModel):
     duration: int
     rating: float
     rating_count: int
+    is_enrolled: bool
 
 
 class Course(CommonAttrs):
