@@ -39,7 +39,7 @@ class QuestionCreate(BaseModel):
         return answers
 
 
-class Quiz(CommonAttrs):
+class Quiz(BaseModel):
     class Question(CommonAttrs):
         class Answer(CommonAttrs):
             content: str

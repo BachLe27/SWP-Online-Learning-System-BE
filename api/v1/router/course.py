@@ -107,7 +107,6 @@ async def create_course_chapter_by_course_id(data: ChapterCreate, course: Course
         "detail": await ChapterCrud.create({
             **data.dict(),
             "course_id": course.id,
-            "author_id": course.author_id
         })
     }
 

@@ -36,7 +36,7 @@ async def _get_result_for(quiz_taken: QuizTakenCrud):
             questions := [
                 {
                     **question,
-                    "answers": (answers := await QuizTakenDetailCrud.find_all_answers_by_question_id_no_limit(question.id)),
+                    "answers": (answers := await QuizTakenDetailCrud.find_all_answers_by_question_id_and_quiz_taken_id_no_limit(question.id, quiz_taken.id)),
                     "is_correct": sum(1 for answer in answers if answer.is_correct) == await AnswerCrud.count_correct_by_question_id(question.id),
                 }
                 for question in await QuestionCrud.find_all_by_quiz_id_no_limit(quiz.id)
@@ -68,13 +68,11 @@ async def read_quiz_by_lesson_id(quiz: QuizCrud = Depends(_get_current_lesson_qu
 async def create_quiz_by_lesson_id(data: QuizCreate, lesson: LessonCrud = Depends(require_author(LessonCrud))):
     if await QuizCrud.exist_by_lesson_id(lesson.id):
         raise ConflictException()
-    return {
-        "detail": await QuizCrud.create({
-            **data.dict(),
-            "lesson_id": lesson.id,
-            "author_id": lesson.author_id
-        })
-    }
+    await QuizCrud.create({
+        **data.dict(),
+        "lesson_id": lesson.id,
+    })
+    return {"detail": "Created"}
 
 
 @lesson_quiz_router.put("", response_model=Detail, tags=["Expert", "Lesson", "Quiz"])
@@ -94,7 +92,6 @@ async def create_question_by_lesson_id(data: QuestionCreate, quiz: QuizCrud = De
     question_id = await QuestionCrud.create({
         "content": data.content,
         "quiz_id": quiz.id,
-        "author_id": quiz.author_id
     })
     for answer in data.answers:
         await AnswerCrud.create({
@@ -114,7 +111,7 @@ async def submit_quiz_by_lesson_id(data: QuizSubmit, quiz: QuizCrud = Depends(_g
     try:
         for question in data.questions:
             if not await QuestionCrud.exist_by_id_and_quiz_id(question.id, quiz.id):
-                raise BadRequestException(f"Question '{question.id}' not found for quiz '{quiz.id}'")
+                raise BadRequestException(f"Question '{question.id}' not found for current quiz")
             for answer_id in question.answer_ids:
                 if not await AnswerCrud.exist_by_id_and_question_id(answer_id, question.id):
                     raise BadRequestException(f"Answer '{answer_id}' not found for question '{question.id}'")

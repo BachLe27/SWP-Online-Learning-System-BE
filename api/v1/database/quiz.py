@@ -124,7 +124,7 @@ class AnswerCrud(Crud, Base):
 class QuizTakenCrud(Crud, Base):
     __tablename__ = "QuizzesTaken"
 
-    quiz_id = Column(String(36), ForeignKey("Lessons.id", ondelete="CASCADE"), nullable=False)
+    quiz_id = Column(String(36), ForeignKey("Quizzes.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
@@ -150,9 +150,10 @@ class QuizTakenDetailCrud(Crud, Base):
         return await cls.find_all_by_attr_no_limit(cls.quiz_taken_id, quiz_taken_id)
 
     @classmethod
-    async def find_all_answers_by_question_id_no_limit(cls, question_id: str):
+    async def find_all_answers_by_question_id_and_quiz_taken_id_no_limit(cls, question_id: str, quiz_taken_id: str):
         return await cls.fetch_all(
             AnswerCrud.select()
                 .join(cls)
                 .where(cls.question_id == question_id)
+                .where(cls.quiz_taken_id == quiz_taken_id)
         )
