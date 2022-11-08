@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 
 from ..database.lesson import LessonCrud
 from ..database.quiz import QuizCrud
-from ..middleware.auth import require_author, require_existed
+from ..middleware.auth import require_author
+from ..middleware.purchase import require_enrolled
 from ..schema.base import Detail
 from ..schema.lesson import Lesson, LessonUpdate
 
@@ -10,7 +11,7 @@ lesson_router = APIRouter()
 
 
 @lesson_router.get("/{id}", response_model=Lesson, tags=["Lesson"])
-async def read_lesson_by_id(lesson: LessonCrud = Depends(require_existed(LessonCrud))):
+async def read_lesson_by_id(lesson: LessonCrud = Depends(require_enrolled(LessonCrud))):
     return {
         **lesson,
         "has_quiz": await QuizCrud.exist_by_lesson_id(lesson.id)

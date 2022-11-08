@@ -11,7 +11,7 @@ CLIENT_SECRET = getenv("PAYPAL_CLIENT_SECRET")
 
 client = PayPalHttpClient(
     SandboxEnvironment(CLIENT_ID, CLIENT_SECRET) if ENVIRONMENT == "SANDBOX"
-        else LiveEnvironment(CLIENT_ID, CLIENT_SECRET)
+    else LiveEnvironment(CLIENT_ID, CLIENT_SECRET)
 )
 
 def create_order():

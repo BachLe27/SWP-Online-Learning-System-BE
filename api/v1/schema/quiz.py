@@ -28,7 +28,7 @@ class QuestionCreate(BaseModel):
         content: str
         is_correct: bool
     content: str
-    answers : list[AnswerCreate]
+    answers: list[AnswerCreate]
 
     @validator("answers")
     def validate_answers(cls, answers):
@@ -45,7 +45,7 @@ class Quiz(CommonAttrs):
             content: str
             is_correct: bool | None
         content: str
-        answers : list[Answer]
+        answers: list[Answer]
         has_more_than_one_correct_answer: bool
     to_pass: float
     questions: list[Question]

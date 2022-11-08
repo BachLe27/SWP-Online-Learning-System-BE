@@ -1,15 +1,16 @@
-from sqlalchemy import Boolean, Column, Float, ForeignKey, String, Text, select
-from sqlalchemy.sql.functions import func
+from sqlalchemy import Boolean, Column, Float, ForeignKey, String, Text
 
-from .base import Base, Crud
+from .base import AuthorRelatedCrud, Base, CourseRelatedCrud, Crud
+from .chapter import ChapterCrud
+from .course import CourseCrud
+from .lesson import LessonCrud
 
 
-class QuizCrud(Crud, Base):
+class QuizCrud(AuthorRelatedCrud, CourseRelatedCrud, Base):
     __tablename__ = "Quizzes"
 
     to_pass = Column(Float, nullable=False)
     lesson_id = Column(String(36), ForeignKey("Lessons.id", ondelete="CASCADE"), nullable=False)
-    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
     async def find_by_lesson_id(cls, lesson_id: str):
@@ -22,13 +23,33 @@ class QuizCrud(Crud, Base):
     async def exist_by_lesson_id(cls, lesson_id: str):
         return await cls.find_by_lesson_id(lesson_id) is not None
 
+    @classmethod
+    async def find_course_id(cls, obj) -> str:
+        return (
+            await cls.fetch_one(
+                ChapterCrud.select()
+                    .join(LessonCrud)
+                    .where(LessonCrud.id == obj.lesson_id)
+            )
+        ).course_id
+
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        return (
+            await cls.fetch_one(
+                CourseCrud.select()
+                    .join(ChapterCrud)
+                    .join(LessonCrud)
+                    .where(LessonCrud.id == obj.lesson_id)
+            )
+        ).author_id
+
 
 class QuestionCrud(Crud, Base):
     __tablename__ = "Questions"
 
     content = Column(Text, nullable=False)
     quiz_id = Column(String(36), ForeignKey("Quizzes.id", ondelete="CASCADE"), nullable=False)
-    author_id = Column(String(36), ForeignKey("Users.id"), nullable=False)
 
     @classmethod
     async def find_all_by_quiz_id_no_limit(cls, quiz_id: str):
@@ -41,6 +62,29 @@ class QuestionCrud(Crud, Base):
     @classmethod
     async def count_by_quiz_id(cls, quiz_id: str):
         return await cls.count_by_attr(cls.quiz_id, quiz_id)
+
+    @classmethod
+    async def find_course_id(cls, obj) -> str:
+        return (
+            await cls.fetch_one(
+                ChapterCrud.select()
+                    .join(LessonCrud)
+                    .join(QuizCrud)
+                    .where(QuizCrud.id == obj.quiz_id)
+            )
+        ).course_id
+
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        return (
+            await cls.fetch_one(
+                CourseCrud.select()
+                    .join(ChapterCrud)
+                    .join(LessonCrud)
+                    .join(QuizCrud)
+                    .where(QuizCrud.id == obj.quiz_id)
+            )
+        ).author_id
 
 
 class AnswerCrud(Crud, Base):
@@ -62,8 +106,9 @@ class AnswerCrud(Crud, Base):
     async def find_all_by_question_id_no_limit(cls, question_id: str, hide_answer: bool = False):
         if hide_answer:
             return await cls.fetch_all(
-                select(cls.id, cls.created_at, cls.updated_at, cls.content)
+                cls.select()
                     .where(cls.question_id == question_id)
+                    .with_only_columns(cls.id, cls.created_at, cls.updated_at, cls.content)
             )
         return await cls.find_all_by_attr_no_limit(cls.question_id, question_id)
 
@@ -88,6 +133,7 @@ class QuizTakenCrud(Crud, Base):
             cls.select()
                 .where(cls.quiz_id == quiz_id)
                 .where(cls.user_id == user_id)
+                .order_by(cls.created_at.desc())
                 .limit(limit).offset(offset)
         )
 

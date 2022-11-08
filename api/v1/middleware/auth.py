@@ -1,7 +1,7 @@
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from ..database.base import Crud
+from ..database.base import AuthorRelatedCrud, Crud
 from ..database.user import UserCrud
 from ..exception.http import (CredentialException, ForbiddenException,
                               NotFoundException)
@@ -38,11 +38,11 @@ def require_existed(crud: Crud):
     return func
 
 
-def require_author(crud: Crud):
-    async def func(obj = Depends(crud.find_by_id), user: UserCrud = Depends(get_current_user)):
+def require_author(crud: AuthorRelatedCrud):
+    async def func(obj: AuthorRelatedCrud = Depends(crud.find_by_id), user: UserCrud = Depends(get_current_user)):
         if obj is None:
             raise NotFoundException()
-        if obj.author_id != user.id:
+        if await crud.find_author_id(obj) != user.id:
             raise ForbiddenException()
         return obj
     return func

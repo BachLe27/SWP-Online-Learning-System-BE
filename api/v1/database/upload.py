@@ -3,10 +3,10 @@ from uuid import uuid4
 
 from sqlalchemy import Column, ForeignKey, String, Text
 
-from .base import Base, Crud
+from .base import AuthorRelatedCrud, Base
 
 
-class UploadCrud(Crud, Base):
+class UploadCrud(AuthorRelatedCrud, Base):
     __tablename__ = "Uploads"
 
     file_path = Column(Text, nullable=False)
@@ -22,3 +22,7 @@ class UploadCrud(Crud, Base):
         attrs["file_path"] = attrs["file_path"].format(id=id)
         await cls.execute(cls.insert().values(**attrs))
         return id
+
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        return obj.author_id

@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Float, ForeignKey, String, Text, select
 from sqlalchemy.sql.functions import func
 
-from .base import Base, Crud
+from .base import AuthorRelatedCrud, Base, CourseRelatedCrud, Crud
 from .user import UserCrud
 
 
@@ -18,7 +18,7 @@ class CourseLevel:
     ALL = ( BEGINNER, INTERMEDIATE, ADVANCED )
 
 
-class CourseCrud(Crud, Base):
+class CourseCrud(AuthorRelatedCrud, CourseRelatedCrud, Base):
     __tablename__ = "Courses"
 
     title = Column(String(256), nullable=False)
@@ -47,6 +47,14 @@ class CourseCrud(Crud, Base):
                 .where(cls.level.in_(levels))
                 .limit(limit).offset(offset)
         )
+
+    @classmethod
+    async def find_course_id(cls, obj) -> str:
+        return obj.id
+
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        return obj.author_id
 
 
 class EnrollmentCrud(Crud, Base):

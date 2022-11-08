@@ -25,5 +25,4 @@ class Lesson(CommonAttrs):
     description: str
     content: str
     video_url: str | None
-    chapter_id: str
     has_quiz: bool

@@ -1,9 +1,9 @@
 from sqlalchemy import Column, ForeignKey, String, Text
 
-from .base import Base, Crud
+from .base import AuthorRelatedCrud, Base
 
 
-class PostCrud(Crud, Base):
+class PostCrud(AuthorRelatedCrud, Base):
     __tablename__ = "Posts"
 
     title = Column(String(256), nullable=False)
@@ -16,6 +16,7 @@ class PostCrud(Crud, Base):
         return await cls.fetch_all(
             cls.select()
                 .where(cls.title.contains(search))
+                .order_by(cls.created_at.desc())
                 .limit(limit).offset(offset)
         )
 
@@ -28,8 +29,12 @@ class PostCrud(Crud, Base):
                 .limit(limit).offset(offset)
         )
 
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        return obj.author_id
 
-class CommentCrud(Crud, Base):
+
+class CommentCrud(AuthorRelatedCrud, Base):
     __tablename__ = "Comments"
 
     content = Column(Text, nullable=False)
@@ -43,3 +48,7 @@ class CommentCrud(Crud, Base):
     @classmethod
     async def count_by_post_id(cls, post_id: str):
         return await cls.count_by_attr(cls.post_id, post_id)
+
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        return obj.author_id

@@ -36,16 +36,16 @@ class UserCrud(Crud, Base):
     @classmethod
     async def create_admin(cls, username: str, password: str, email: str) -> str:
         return await super().create({
-            "username" : username,
-            "password" : password,
-            "email" : email,
-            "full_name" : "",
-            "gender" : True,
-            "dob" : date.today(),
-            "phone" : "",
-            "address" : "",
-            "bio" : "",
-            "role" : UserRole.ADMIN,
+            "username": username,
+            "password": password,
+            "email": email,
+            "full_name": "",
+            "gender": True,
+            "dob": date.today(),
+            "phone": "",
+            "address": "",
+            "bio": "",
+            "role": UserRole.ADMIN,
         })
 
     @classmethod

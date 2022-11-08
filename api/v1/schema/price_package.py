@@ -24,3 +24,10 @@ class PricePackage(CommonAttrs):
     price: float
     duration: int
     description: str
+
+
+class Purchase(BaseModel):
+    user_id: str
+    price_package_id: str
+    purchase_price: float
+    end_date: date

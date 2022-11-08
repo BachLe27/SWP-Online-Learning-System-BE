@@ -111,3 +111,15 @@ class Crud:
     @classmethod
     async def delete_all_by_attr(cls, attr, value):
         return await cls.execute(cls.delete().where(attr == value))
+
+
+class AuthorRelatedCrud(Crud):
+    @classmethod
+    async def find_author_id(cls, obj) -> str:
+        raise NotImplementedError
+
+
+class CourseRelatedCrud(Crud):
+    @classmethod
+    async def find_course_id(cls, obj) -> str:
+        raise NotImplementedError()

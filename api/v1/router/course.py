@@ -8,6 +8,7 @@ from ..database.user import UserCrud, UserRole
 from ..exception.http import ConflictException
 from ..middleware.auth import (get_current_user, require_author,
                                require_existed, require_roles)
+from ..middleware.purchase import require_paid
 from ..middleware.query import parse_course_levels
 from ..schema.base import Detail
 from ..schema.chapter import Chapter, ChapterCreate
@@ -126,7 +127,7 @@ async def delete_course_by_id(course: CourseCrud = Depends(require_author(Course
 
 
 @course_router.post("/{id}/enroll", response_model=Detail, tags=["Course"])
-async def enroll_course_by_id(course: CourseCrud = Depends(require_existed(CourseCrud)), user: UserCrud = Depends(get_current_user)):
+async def enroll_course_by_id(course: CourseCrud = Depends(require_existed(CourseCrud)), user: UserCrud = Depends(require_paid)):
     if await EnrollmentCrud.exist_by_user_id_and_course_id(user.id, course.id):
         raise ConflictException()
     return {

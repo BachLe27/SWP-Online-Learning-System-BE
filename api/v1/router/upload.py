@@ -5,6 +5,7 @@ from ..database.upload import UploadCrud
 from ..database.user import UserCrud
 from ..exception.http import InternalServerErrorException
 from ..middleware.auth import get_current_user, require_existed
+from ..middleware.upload import validate_image
 from ..schema.base import Detail
 from ..service.storage import download_file, upload_file
 
@@ -12,7 +13,7 @@ upload_router = APIRouter()
 
 
 @upload_router.post("", response_model=Detail, tags=["Upload"])
-async def upload(file: UploadFile, user: UserCrud = Depends(get_current_user)):
+async def upload(file: UploadFile = Depends(validate_image), user: UserCrud = Depends(get_current_user)):
     id = await UploadCrud.create({
         "file_path": "{id}",
         "content_type": file.content_type,

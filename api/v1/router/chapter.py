@@ -4,6 +4,7 @@ from ..database.chapter import ChapterCrud
 from ..database.lesson import LessonCrud
 from ..database.quiz import QuizCrud
 from ..middleware.auth import require_author, require_existed
+from ..middleware.purchase import require_enrolled
 from ..schema.base import Detail
 from ..schema.chapter import Chapter, ChapterUpdate
 from ..schema.lesson import Lesson, LessonCreate
@@ -29,7 +30,7 @@ async def delete_chapter_by_id(chapter: ChapterCrud = Depends(require_author(Cha
 
 
 @chapter_router.get("/{id}/lesson", response_model=list[Lesson], tags=["Chapter", "Lesson"])
-async def read_chapter_lessons_by_chapter_id(limit: int = 10, offset: int = 0, chapter: ChapterCrud = Depends(require_existed(ChapterCrud))):
+async def read_chapter_lessons_by_chapter_id(limit: int = 10, offset: int = 0, chapter: ChapterCrud = Depends(require_enrolled(ChapterCrud))):
     return [
         {
             **lesson,

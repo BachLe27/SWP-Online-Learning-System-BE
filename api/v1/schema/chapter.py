@@ -16,4 +16,3 @@ class ChapterUpdate(BaseModel):
 class Chapter(CommonAttrs):
     title: str
     description: str
-    course_id: str
