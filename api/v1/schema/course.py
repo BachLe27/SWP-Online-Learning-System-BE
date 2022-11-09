@@ -10,7 +10,7 @@ class CategoryCreate(BaseModel):
 
 
 class CategoryUpdate(BaseModel):
-    name: str
+    name: str | None
 
 
 class Category(CommonAttrs):

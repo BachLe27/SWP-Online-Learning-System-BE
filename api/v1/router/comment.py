@@ -10,7 +10,7 @@ comment_router = APIRouter()
 
 @comment_router.put("/{id}", response_model=Detail, tags=["Post"])
 async def update_comment_by_id(data: CommentUpdate, comment: CommentCrud = Depends(require_author(CommentCrud))):
-    await CommentCrud.update_by_id(comment.id, data.dict())
+    await CommentCrud.update_by_id(comment.id, data.dict(exclude_none=True))
     return {"detail": "Updated"}
 
 

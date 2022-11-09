@@ -29,7 +29,7 @@ class CommentCreate(BaseModel):
 
 
 class CommentUpdate(BaseModel):
-    content: str
+    content: str | None
 
 
 class Comment(CommonAttrs):

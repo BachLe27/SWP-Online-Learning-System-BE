@@ -26,7 +26,7 @@ async def create_category(data: CategoryCreate):
 
 @category_router.put("/{id}", response_model=Detail, **auth_middleware)
 async def update_category_by_id(data: CategoryUpdate, category: CategoryCrud = Depends(require_existed(CategoryCrud))):
-    await CategoryCrud.update_by_id(category.id, data.dict())
+    await CategoryCrud.update_by_id(category.id, data.dict(exclude_none=True))
     return {"detail": "Updated"}
 
 

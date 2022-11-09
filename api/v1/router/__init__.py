@@ -9,9 +9,9 @@ from .lesson_quiz import lesson_quiz_router
 from .post import post_router
 from .price_package import price_package_router
 from .question import question_router
+from .slider import slider_router
 from .upload import upload_router
 from .user import user_router
-
 
 __all__ = (
     "auth_router",
@@ -25,6 +25,7 @@ __all__ = (
     "post_router",
     "price_package_router",
     "question_router",
+    "slider_router",
     "upload_router",
     "user_router",
 )

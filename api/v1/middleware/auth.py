@@ -7,11 +7,13 @@ from ..exception.http import (CredentialException, ForbiddenException,
                               NotFoundException)
 from ..service.jwt import JWTError, decode_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str|None = Depends(oauth2_scheme)):
     try:
+        if token is None:
+            raise CredentialException()
         payload = decode_token(token)
         if payload["type"] != "access":
             raise CredentialException()
@@ -23,7 +25,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise CredentialException()
 
 
-async def get_current_user_or_none(token: str = Depends(oauth2_scheme)):
+async def get_current_user_or_none(token: str|None = Depends(oauth2_scheme)):
     try:
         return await get_current_user(token)
     except CredentialException:

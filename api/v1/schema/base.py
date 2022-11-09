@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 
 class CommonAttrs(BaseModel):
-    id: str
+    id: UUID4
     created_at: datetime
     updated_at: datetime
 
