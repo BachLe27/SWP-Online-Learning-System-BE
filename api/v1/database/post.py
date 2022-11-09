@@ -12,21 +12,12 @@ class PostCrud(AuthorRelatedCrud, Base):
     author_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
-    async def find_all(cls, search: str, limit: int, offset: int):
+    async def find_all(cls, search: str, user_ids: list[str], limit: int, offset: int):
+        stmt = cls.select().where(cls.title.contains(search))
+        if user_ids:
+            stmt = stmt.where(cls.author_id.in_(user_ids))
         return await cls.fetch_all(
-            cls.select()
-                .where(cls.title.contains(search))
-                .order_by(cls.created_at.desc())
-                .limit(limit).offset(offset)
-        )
-
-    @classmethod
-    async def find_all_by_author_id(cls, author_id: str, search: str, limit: int, offset: int):
-        return await cls.fetch_all(
-            cls.select()
-                .where(cls.author_id == author_id)
-                .where(cls.title.contains(search))
-                .order_by(cls.created_at.desc())
+            stmt.order_by(cls.created_at.desc())
                 .limit(limit).offset(offset)
         )
 

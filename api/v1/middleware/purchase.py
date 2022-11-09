@@ -16,7 +16,7 @@ async def require_paid(user: UserCrud = Depends(get_current_user)):
     return user
 
 
-def require_enrolled(crud: CourseRelatedCrud):
+def require_enrolled(crud: type[CourseRelatedCrud]):
     async def func(obj: CourseRelatedCrud = Depends(crud.find_by_id), user: UserCrud = Depends(require_paid)):
         if obj is None:
             raise NotFoundException()

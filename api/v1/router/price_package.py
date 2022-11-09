@@ -77,11 +77,14 @@ async def purchase_price_package(
     async def task():
         for _ in range(100): # 10min
             print("Checking order")
-            match (await check_order(order["id"]))["status"]:
+            check_result = await check_order(order["id"])
+            match check_result["status"]:
                 case "COMPLETED":
                     return
                 case "APPROVED":
-                    match (await capture_order(order["id"]))["status"]:
+                    print("Capturing order")
+                    capture_result = await capture_order(order["id"])
+                    match capture_result["status"]:
                         case "COMPLETED":
                             await PurchaseCrud.create({
                                 "price_package_id": price_package.id,
@@ -89,6 +92,7 @@ async def purchase_price_package(
                                 "purchase_price": price_package.price,
                                 "end_date": date.today() + timedelta(days=price_package.duration)
                             })
+                            print("Purchase completed")
                             return
                         case "EXCEPTION":
                             return

@@ -26,27 +26,25 @@ def run_in_executor(func):
 @run_in_executor
 def create_order(amount: float) -> dict:
     request = OrdersCreateRequest()
-    request.request_body(
-        {
-            "intent": "CAPTURE",
-            "purchase_units": [
-                {
-                    "amount": {
-                        "currency_code": "USD",
-                        "value": amount
-                    }
+    request.request_body({
+        "intent": "CAPTURE",
+        "purchase_units": [
+            {
+                "amount": {
+                    "currency_code": "USD",
+                    "value": amount
                 }
-            ]
-        }
-    )
+            }
+        ]
+    })
     try:
         response = client.execute(request)
         return response.result.dict()
     except Exception as e:
-        print(e.message)
+        print(e)
         return {
             "status": "EXCEPTION",
-            "message": e.message
+            "message": str(e)
         }
 
 @run_in_executor
@@ -55,10 +53,10 @@ def check_order(id: str) -> dict:
         response = client.execute(OrdersGetRequest(id))
         return response.result.dict()
     except Exception as e:
-        print(e.message)
+        print(e)
         return {
             "status": "EXCEPTION",
-            "message": e.message
+            "message": str(e)
         }
 
 @run_in_executor
@@ -67,8 +65,8 @@ def capture_order(id: str) -> dict:
         response = client.execute(OrdersCaptureRequest(id))
         return response.result.dict()
     except Exception as e:
-        print(e.message)
+        print(e)
         return {
             "status": "EXCEPTION",
-            "message": e.message
+            "message": str(e)
         }

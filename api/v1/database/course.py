@@ -30,21 +30,16 @@ class CourseCrud(AuthorRelatedCrud, CourseRelatedCrud, Base):
     author_id = Column(String(36), ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
 
     @classmethod
-    async def find_all(cls, search: str, levels: list[str], limit: int, offset: int):
+    async def find_all(cls, search: str, levels: list[str], category_ids: list[str], user_ids: list[str], limit: int, offset: int):
+        stmt = cls.select().where(cls.title.contains(search))
+        if levels:
+            stmt = stmt.where(cls.level.in_(levels))
+        if category_ids:
+            stmt = stmt.where(cls.category_id.in_(category_ids))
+        if user_ids:
+            stmt = stmt.where(cls.author_id.in_(user_ids))
         return await cls.fetch_all(
-            cls.select()
-                .where(cls.title.contains(search))
-                .where(cls.level.in_(levels))
-                .limit(limit).offset(offset)
-        )
-
-    @classmethod
-    async def find_all_by_author_id(cls, author_id: str, search: str, levels: list[str], limit: int, offset: int):
-        return await cls.fetch_all(
-            cls.select()
-                .where(cls.author_id == author_id)
-                .where(cls.title.contains(search))
-                .where(cls.level.in_(levels))
+            stmt.order_by(cls.created_at.desc())
                 .limit(limit).offset(offset)
         )
 

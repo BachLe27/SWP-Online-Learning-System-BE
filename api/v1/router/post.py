@@ -3,20 +3,26 @@ from fastapi import APIRouter, Depends
 
 from ..database.post import CommentCrud, PostCrud
 from ..middleware.auth import get_current_user, require_author, require_existed
+from ..middleware.query import parse_user_ids
 from ..schema.base import Detail
 from ..schema.post import Comment, CommentCreate, Post, PostCreate, PostUpdate
 
 post_router = APIRouter()
 
 @post_router.get("", response_model=list[Post], tags=["Post"])
-async def read_all_posts(search: str = "", limit: int = 10, offset: int = 0):
+async def read_all_posts(
+    search: str = "",
+    user_ids: list[str] = Depends(parse_user_ids),
+    limit: int = 10,
+    offset: int = 0
+):
     return [
         {
             **post,
             "comment_count": await CommentCrud.count_by_post_id(post.id),
             "author": await UserCrud.find_by_id(post.author_id),
         }
-        for post in await PostCrud.find_all(search, limit, offset)
+        for post in await PostCrud.find_all(search, user_ids, limit, offset)
     ]
 
 
@@ -38,7 +44,7 @@ async def read_created_posts(search: str = "", limit: int = 10, offset: int = 0,
             "comment_count": await CommentCrud.count_by_post_id(post.id),
             "author": await UserCrud.find_by_id(post.author_id),
         }
-        for post in await PostCrud.find_all_by_author_id(user.id, search, limit, offset)
+        for post in await PostCrud.find_all(search, [user.id], limit, offset)
     ]
 
 

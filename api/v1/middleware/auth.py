@@ -32,7 +32,7 @@ async def get_current_user_or_none(token: str|None = Depends(oauth2_scheme)):
         return None
 
 
-def require_existed(crud: Crud):
+def require_existed(crud: type[Crud]):
     async def func(obj = Depends(crud.find_by_id)):
         if obj is None:
             raise NotFoundException()
@@ -40,7 +40,7 @@ def require_existed(crud: Crud):
     return func
 
 
-def require_author(crud: AuthorRelatedCrud):
+def require_author(crud: type[AuthorRelatedCrud]):
     async def func(obj: AuthorRelatedCrud = Depends(crud.find_by_id), user: UserCrud = Depends(get_current_user)):
         if obj is None:
             raise NotFoundException()

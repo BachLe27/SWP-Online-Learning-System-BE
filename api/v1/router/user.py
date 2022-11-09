@@ -17,11 +17,11 @@ user_router = APIRouter()
 
 @user_router.get("", response_model=list[User], tags=["Profile"])
 async def read_all_profiles(
-        search: str = "",
-        roles: list[str] = Depends(parse_user_roles),
-        limit: int = 10,
-        offset: int = 0,
-    ):
+    search: str = "",
+    roles: list[str] = Depends(parse_user_roles),
+    limit: int = 10,
+    offset: int = 0,
+):
     return await UserCrud.find_all(search, roles, limit, offset)
 
 

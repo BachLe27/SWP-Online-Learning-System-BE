@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from ..database.chapter import ChapterCrud
 from ..database.course import (CategoryCrud, CourseCrud, EnrollmentCrud,
@@ -9,7 +9,7 @@ from ..exception.http import ConflictException
 from ..middleware.auth import (get_current_user, get_current_user_or_none,
                                require_author, require_existed, require_roles)
 from ..middleware.purchase import require_paid
-from ..middleware.query import parse_course_levels
+from ..middleware.query import parse_course_levels, parse_category_ids, parse_user_ids
 from ..schema.base import Detail
 from ..schema.chapter import Chapter, ChapterCreate
 from ..schema.course import Course, CourseCreate, CourseOverview, CourseUpdate
@@ -20,18 +20,20 @@ course_router = APIRouter()
 
 @course_router.get("", response_model=list[Course], tags=["Course"])
 async def read_all_courses(
-        search: str = "",
-        levels: list[str] = Depends(parse_course_levels),
-        limit: int = 10,
-        offset: int = 0
-    ):
+    search: str = "",
+    levels: list[str] = Depends(parse_course_levels),
+    category_ids: list[str] = Depends(parse_category_ids),
+    user_ids: list[str] = Depends(parse_user_ids),
+    limit: int = 10,
+    offset: int = 0
+):
     return [
         {
             **course,
             "category": await CategoryCrud.find_by_id(course.category_id),
             "author": await UserCrud.find_by_id(course.author_id)
         }
-        for course in await CourseCrud.find_all(search, levels, limit, offset)
+        for course in await CourseCrud.find_all(search, levels, category_ids, user_ids, limit, offset)
     ]
 
 
@@ -47,19 +49,20 @@ async def create_course(data: CourseCreate, user: UserCrud = Depends(require_rol
 
 @course_router.get("/created", response_model=list[Course], tags=["Expert", "Course"])
 async def read_created_courses(
-        search: str = "",
-        levels: list[str] = Depends(parse_course_levels),
-        limit: int = 10,
-        offset: int = 0,
-        user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))
-    ):
+    search: str = "",
+    levels: list[str] = Depends(parse_course_levels),
+    category_ids: list[str] = Depends(parse_category_ids),
+    limit: int = 10,
+    offset: int = 0,
+    user: UserCrud = Depends(require_roles(UserRole.ADMIN, UserRole.EXPERT))
+):
     return [
         {
             **course,
             "category": await CategoryCrud.find_by_id(course.category_id),
             "author": await UserCrud.find_by_id(course.author_id)
         }
-        for course in await CourseCrud.find_all_by_author_id(user.id, search, levels, limit, offset)
+        for course in await CourseCrud.find_all(search, levels, category_ids, [user.id], limit, offset)
     ]
 
 

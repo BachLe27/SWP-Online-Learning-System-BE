@@ -66,12 +66,10 @@ class UserCrud(Crud, Base):
 
     @classmethod
     async def find_all(cls, search: str, roles: list[str], limit: int, offset: int):
-        return await cls.fetch_all(
-            cls.select()
-                .where(cls.full_name.contains(search))
-                .where(cls.role.in_(roles))
-                .limit(limit).offset(offset)
-        )
+        stmt = cls.select().where(cls.full_name.contains(search))
+        if roles:
+            stmt = stmt.where(cls.role.in_(roles))
+        return await cls.fetch_all(stmt.limit(limit).offset(offset))
 
     @classmethod
     async def update_role_by_id(cls, id: str, role: str):
